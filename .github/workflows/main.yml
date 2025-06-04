@@ -1,6 +1,7 @@
 name: Automated Code Review
 
 on:
+  workflow_dispatch:
   push:
     branches-ignore:
       - main
