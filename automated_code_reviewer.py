@@ -11,7 +11,7 @@ def get_code_diff(branch_name="demo_test"):
     """Get diff between current branch and main branch"""
     try:
         result = subprocess.run(
-            ['git', 'diff', f'origin/main...autotest-review'],
+            ['git', 'diff', f'origin/main...origin/autotest-review'],
             capture_output=True,
             text=True,
             check=True
@@ -41,8 +41,7 @@ Code changes:
             ['ollama', 'run', 'mistral', prompt],
             capture_output=True,
             text=True,
-            check=True,
-            timeout=300
+            check=True
         )
         
         response = result.stdout.strip()
