@@ -9,19 +9,19 @@ class Calculator:
     
     def add(self, a, b):
         """Add two numbers"""
-        result = a + b
+        result = a + b;
         self.history.append(f"{a} + {b} = {result}")
         return result
     
     def subtract(self, a, b):
         """Subtract second number from first"""
-        result = a - b
+        result = a - b;
         self.history.append(f"{a} - {b} = {result}")
         return result
     
     def multiply(self, a, b):
         """Multiply two numbers"""
-        result = a * b
+        result = a * b;
         self.history.append(f"{a} * {b} = {result}")
         return result
     
@@ -29,7 +29,7 @@ class Calculator:
         """Divide first number by second"""
         if b == 0:
             raise ValueError("Cannot divide by zero")
-        result = a / b
+        result = a / b;
         self.history.append(f"{a} / {b} = {result}")
         return result
     
