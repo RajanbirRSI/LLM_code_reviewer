@@ -55,7 +55,8 @@ jobs:
         python automated_code_reviewer.py > review_output.txt 2>&1
         
         # Extract score from output
-        SCORE=$(grep -o "Score: [0-9]\+/100" review_output.txt | grep -o "[0-9]\+" | tail -1)
+        #SCORE=$(grep -o "Score: [0-9]\+/100" review_output.txt | grep -o "[0-9]\+" | tail -1)
+        SCORE=$(grep -oE "Score: [0-9]+/100" review_output.txt | grep -oE "[0-9]+" | head -1)
         if [ -z "$SCORE" ]; then
           SCORE=0
         fi
