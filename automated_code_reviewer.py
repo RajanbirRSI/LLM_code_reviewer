@@ -12,7 +12,7 @@ def get_code_diff(branch_name="demo_test"):
     try:
         # Fetch branches first (needed for GitHub Actions)
         subprocess.run(['git', 'fetch', 'origin'], check=True, capture_output=True)
-        
+
         result = subprocess.run(
             ['git', 'diff', f'origin/main...origin/autotest-review'],
             capture_output=True,
