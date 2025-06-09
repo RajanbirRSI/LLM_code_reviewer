@@ -52,4 +52,24 @@ jobs:
     - name: Run code review
       id: code-review
       run: |
-        python automated_code_reviewer.py
+        python automated_code_reviewer.py > review_output.txt 2>&1
+        
+        # Extract score from output
+        #SCORE=$(grep -o "Score: [0-9]\+/100" review_output.txt | grep -o "[0-9]\+" | tail -1)
+        #SCORE=$(grep -oE "Score: [0-9]+/100" review_output.txt | grep -oE "[0-9]+" | head -1)
+        SCORE=$(grep -oE "\b[0-9]+/100\b" review_output.txt | cut -d'/' -f1 | head -1)
+        if [ -z "$SCORE" ]; then
+          SCORE=0
+        fi
+        
+        # Set outputs
+        echo "score=$SCORE" >> $GITHUB_OUTPUT
+        echo "passed=$([ $SCORE -ge 80 ] && echo 'true' || echo 'false')" >> $GITHUB_OUTPUT
+        
+        # Display results
+        echo "Review Score: $SCORE"
+        echo "Review Passed: $([ $SCORE -ge 80 ] && echo 'YES' || echo 'NO')"
+        
+        # Show full output
+        echo "Full Review Output:"
+        cat review_output.txt
