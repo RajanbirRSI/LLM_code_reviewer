@@ -29,9 +29,14 @@ def evaluate_with_ollama(diff_content):
     if not diff_content:
         return "No changes found", 85
     
-    prompt = f"""Review these code changes and provide a score out of 100.
-Consider: code quality, functionality, security, and documentation.
-End your response with "SCORE: X" where X is the numerical score.
+    prompt = f"""Review these code changes and provide a score X out of 100.
+        Ensure code is DRY (Don't Repeat Yourself)
+        Check for any security red flags
+        Make sure all code has docstrings and use style
+        Point out code that could be refactored
+        Watch out for code that could lead to GDPR violations
+        Consider: code quality, functionality, security, and documentation.
+        End your response with "SCORE: X" where X is the numerical score.
 
 Code changes:
 ```diff
