@@ -67,7 +67,7 @@ jobs:
         echo "passed=$([ $SCORE -ge 80 ] && echo 'true' || echo 'false')" >> $GITHUB_OUTPUT
         
         # Display results
-        echo "Review Score: $SCORE/100"
+        echo "Review Score: $SCORE"
         echo "Review Passed: $([ $SCORE -ge 80 ] && echo 'YES' || echo 'NO')"
         
         # Show full output
