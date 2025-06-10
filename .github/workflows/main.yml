@@ -156,7 +156,8 @@ jobs:
       uses: actions/github-script@v7
       with:
         script: |
-          const score = ${{ needs.code-review.outputs.review-score }};
+          // Fixed output reference
+          const score = ${{ needs.code-review.outputs.score }};
           
           console.log(`Attempting to merge PR with score: ${score}/100`);
           
