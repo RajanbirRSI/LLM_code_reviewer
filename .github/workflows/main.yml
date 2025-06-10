@@ -73,3 +73,31 @@ jobs:
         # Show full output
         echo "Full Review Output:"
         cat review_output.txt
+
+    - name: Check merge conditions
+      id: check-merge
+      run: |
+        SCORE=${{ steps.code-review.outputs.score }}
+        PASSED=${{ steps.code-review.outputs.passed }}
+        
+        # Merge conditions
+        MIN_SCORE=80
+        IS_PR=${{ github.event_name == 'pull_request' }}
+        
+        echo "Score: $SCORE"
+        echo "Passed: $PASSED"
+        echo "Is PR: $IS_PR"
+        echo "Min Score Required: $MIN_SCORE"
+        
+        # Check if should merge
+        if [ "$PASSED" = "true" ] && [ "$IS_PR" = "true" ] && [ "$SCORE" -ge "$MIN_SCORE" ]; then
+          echo "should-merge=true" >> $GITHUB_OUTPUT
+          echo "✅ All conditions met for auto-merge"
+        else
+          echo "should-merge=false" >> $GITHUB_OUTPUT
+          echo "❌ Conditions not met for auto-merge"
+          echo "  - Score >= $MIN_SCORE: $([ $SCORE -ge $MIN_SCORE ] && echo '✅' || echo '❌')"
+          echo "  - Is Pull Request: $([ "$IS_PR" = "true" ] && echo '✅' || echo '❌')"
+          echo "  - Review Passed: $([ "$PASSED" = "true" ] && echo '✅' || echo '❌')"
+        fi
+    
