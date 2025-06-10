@@ -17,6 +17,12 @@ jobs:
       contents: write
       pull-requests: write
       checks: write
+
+    # Add job-level outputs that reference step outputs
+    outputs:
+      score: ${{ steps.code-review.outputs.score }}
+      passed: ${{ steps.code-review.outputs.passed }}
+      should-merge: ${{ steps.check-merge.outputs.should-merge }}
     
     steps:
     - name: Checkout code
@@ -121,8 +127,6 @@ jobs:
             '✅ Your code meets our quality standards!' : 
             '❌ Please address the issues and push changes for re-review.'
           }
-
-          echo " shouldMerge : ${{ steps.check-merge.outputs.should-merge }} "
           
           ---
           *Minimum score required: 80/100*`;
@@ -187,7 +191,7 @@ jobs:
   notify-failure:
     needs: code-review
     runs-on: ubuntu-latest
-    if: needs.code-review.outputs.review-passed == 'false'
+    if: needs.code-review.outputs.passed == 'false'
     
     steps:
     - name: Notify review failure
