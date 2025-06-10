@@ -80,7 +80,6 @@ jobs:
         SCORE=${{ steps.code-review.outputs.score }}
         PASSED=${{ steps.code-review.outputs.passed }}
         
-        # Merge conditions
         MIN_SCORE=80
         IS_PR=${{ github.event_name == 'pull_request' }}
         
@@ -89,7 +88,6 @@ jobs:
         echo "Is PR: $IS_PR"
         echo "Min Score Required: $MIN_SCORE"
         
-        # Check if should merge
         if [ "$PASSED" = "true" ] && [ "$IS_PR" = "true" ] && [ "$SCORE" -ge "$MIN_SCORE" ]; then
           echo "should-merge=true" >> $GITHUB_OUTPUT
           echo "✅ All conditions met for auto-merge"
@@ -101,3 +99,98 @@ jobs:
           echo "  - Review Passed: $([ "$PASSED" = "true" ] && echo '✅' || echo '❌')"
         fi
     
+    - name: Comment on PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const score = ${{ steps.code-review.outputs.score }};
+          const passed = ${{ steps.code-review.outputs.passed }};
+          const shouldMerge = ${{ steps.check-merge.outputs.should-merge }};
+          
+          const status = passed ? '✅ PASSED' : '❌ FAILED';
+          const mergeStatus = shouldMerge ? '🔄 Auto-merge enabled' : '⏸️ Manual review required';
+          
+          const comment = `## 🤖 Automated Code Review Results
+          
+          **Score:** ${score}/100
+          **Status:** ${status}
+          **Action:** ${mergeStatus}
+          
+          ${passed ? 
+            '✅ Your code meets our quality standards!' : 
+            '❌ Please address the issues and push changes for re-review.'
+          }
+          
+          ---
+          *Minimum score required: 80/100*`;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+
+  auto-merge:
+    needs: code-review
+    runs-on: ubuntu-latest
+    if: needs.code-review.outputs.should-merge == 'true'
+    permissions:
+      contents: write
+      pull-requests: write
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: Auto-merge PR
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const score = ${{ needs.code-review.outputs.review-score }};
+          
+          console.log(`Attempting to merge PR with score: ${score}/100`);
+          
+          try {
+            await github.rest.pulls.merge({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+              commit_title: `Auto-merge: Code review passed (${score}/100)`,
+              commit_message: `Automated merge after successful code review.\nScore: ${score}/100\nThreshold: 80/100`,
+              merge_method: 'squash'
+            });
+            
+            console.log('✅ PR merged successfully!');
+            
+          } catch (error) {
+            console.error('❌ Failed to merge PR:', error.message);
+            
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: `## ⚠️ Auto-merge Failed
+              
+              The code review passed (${score}/100), but automatic merging failed.
+              Please merge manually or check for conflicts.
+              
+              **Error:** ${error.message}`
+            });
+          }
+
+  notify-failure:
+    needs: code-review
+    runs-on: ubuntu-latest
+    if: needs.code-review.outputs.review-passed == 'false'
+    
+    steps:
+    - name: Notify review failure
+      run: |
+        echo "❌ Code review failed"
+        echo "Score: ${{ needs.code-review.outputs.review-score }}/100"
+        echo "Minimum required: 80/100"
+        echo "Manual review and fixes required before merge"
