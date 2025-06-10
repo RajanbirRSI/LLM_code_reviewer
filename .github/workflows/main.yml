@@ -121,6 +121,8 @@ jobs:
             '✅ Your code meets our quality standards!' : 
             '❌ Please address the issues and push changes for re-review.'
           }
+
+          echo " shouldMerge : ${{ steps.check-merge.outputs.should-merge }} "
           
           ---
           *Minimum score required: 80/100*`;
