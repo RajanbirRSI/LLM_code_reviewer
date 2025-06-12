@@ -35,7 +35,12 @@ def evaluate_with_ollama(diff_content):
         Make sure all code has docstrings and use style
         Point out code that could be refactored
         Watch out for code that could lead to GDPR violations
-        Consider: code quality, functionality, security, and documentation.
+        Consider: 
+        1. Code quality (30 points)
+        2. Security (30 points)
+        3. Dry principle (10 points)
+        4. GDPR compliance (10 points)
+        5. Functionality (20 points)
     End your response with "SCORE: X/100" where X is the numerical score.
         
 Code changes:
@@ -46,7 +51,7 @@ Code changes:
     try:
         print("Analyzing with Mistral...")
         result = subprocess.run(
-            ['ollama', 'run', 'llama3.1:8b', prompt],
+            ['ollama', 'run', 'codellama', prompt],
             capture_output=True,
             text=True,
             check=True
