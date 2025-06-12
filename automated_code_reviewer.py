@@ -30,63 +30,13 @@ def evaluate_with_ollama(diff_content):
         return "No changes found", 85
     
     prompt = f"""You are an expert code reviewer. Analyze the provided code changes and assign a score from 0-100 based on the weighted criteria below.
-
-## SCORING RUBRIC (Total: 100 points)
-
-### 1. CODE QUALITY (30 points)
-- **Readability & Style** (10 pts): Consistent naming, formatting, clear structure
-- **DRY Principle** (10 pts): No code duplication, proper abstraction
-- **Design Patterns** (10 pts): Appropriate use of patterns, SOLID principles
-
-### 2. FUNCTIONALITY (25 points)
-- **Logic Correctness** (15 pts): Code works as intended, handles edge cases
-- **Performance** (10 pts): Efficient algorithms, no obvious bottlenecks
-
-### 3. SECURITY (20 points)
-- **Vulnerability Assessment** (15 pts): No SQL injection, XSS, insecure dependencies
-- **Data Privacy** (5 pts): GDPR compliance, secure data handling
-
-### 4. DOCUMENTATION (15 points)
-- **Code Documentation** (10 pts): Comprehensive docstrings, inline comments for complex logic
-- **API Documentation** (5 pts): Clear function/method signatures and descriptions
-
-### 5. MAINTAINABILITY (10 points)
-- **Modularity** (5 pts): Well-structured, loosely coupled components
-- **Error Handling** (5 pts): Proper exception handling and logging
-
-## ANALYSIS FORMAT
-
-**STRENGTHS:**
-- List 2-3 specific positive aspects
-
-**ISSUES FOUND:**
-- **Critical** (0-40 pts): Security vulnerabilities, broken functionality
-- **Major** (41-70 pts): Poor design, significant code quality issues
-- **Minor** (71-90 pts): Style inconsistencies, missing documentation
-- **Suggestions** (91-100 pts): Optimization opportunities, best practice improvements
-
-**DETAILED BREAKDOWN:**
-- Code Quality: X/30
-- Functionality: X/25  
-- Security: X/20
-- Documentation: X/15
-- Maintainability: X/10
-
-**ACTIONABLE RECOMMENDATIONS:**
-1. [Specific fix for highest priority issue]
-2. [Next priority fix]
-3. [Improvement suggestion]
-
-**FINAL SCORE: X/100**
-
-## SCORING GUIDELINES
-- 90-100: Production-ready, excellent quality
-- 80-89: Good quality, minor improvements needed
-- 70-79: Acceptable, some refactoring required
-- 60-69: Below standard, significant issues
-- 0-59: Major problems, extensive rework needed
-
-Analyze the code changes as provided below thoroughly and provide your assessment following this format exactly.
+        Ensure code is DRY (Don't Repeat Yourself)
+        Check for any security red flags
+        Make sure all code has docstrings and use style
+        Point out code that could be refactored
+        Watch out for code that could lead to GDPR violations
+        Consider: code quality, functionality, security, and documentation.
+    End your response with "SCORE: X" where X is the numerical score.
         
 Code changes:
 ```diff
