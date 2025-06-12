@@ -46,7 +46,7 @@ Code changes:
     try:
         print("Analyzing with Mistral...")
         result = subprocess.run(
-            ['ollama', 'run', 'mistral', prompt],
+            ['ollama', 'run', 'llama3.1:8b', prompt],
             capture_output=True,
             text=True,
             check=True
