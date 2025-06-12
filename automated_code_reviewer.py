@@ -72,13 +72,15 @@ Lastly if the score is less than expected theshold that is 75, provide improveme
 
 def extract_score(response):
     """Extract score from AI response"""
-    # Look for "SCORE: X" pattern
-    match = re.search(r'SCORE:\s*(\d+)', response, re.IGNORECASE)
-    if match:
-        return int(match.group(1))
+    # Primary pattern: Look for "Total Score:** X/100" or similar
+    patterns = [
+        r'(?:total\s+score|final\s+score|score)[:*\s]*(\d+)/100',  # "Total Score:** 75/100"
+        r'(\d+)/100',  # Simple "75/100" format
+        r'SCORE:\s*(\d+)',  # "SCORE: 75"
+        r'score\s*[:=]\s*(\d+)',  # "score: 75" or "score = 75"
+        r'(\d+)\s+out\s+of\s+100',  # "75 out of 100"
+    ]
     
-    # Fallback patterns
-    patterns = [r'(\d+)/100', r'(\d+)\s+out\s+of\s+100', r'score\s*:\s*(\d+)']
     for pattern in patterns:
         match = re.search(pattern, response, re.IGNORECASE)
         if match:
