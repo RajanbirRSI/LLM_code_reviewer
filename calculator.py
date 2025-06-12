@@ -9,7 +9,7 @@ import math
 import datetime
 
 class Calculator:
-    """An enhanced calculator class with basic and advanced operations"""
+    """An updated calculator class with basic and advanced operations"""
     
     def __init__(self, precision=2):
         self.history = []
