@@ -36,7 +36,7 @@ def evaluate_with_ollama(diff_content):
         Point out code that could be refactored
         Watch out for code that could lead to GDPR violations
         Consider: code quality, functionality, security, and documentation.
-    End your response with "SCORE: X" where X is the numerical score.
+    End your response with "SCORE: X/100" where X is the numerical score.
         
 Code changes:
 ```diff
