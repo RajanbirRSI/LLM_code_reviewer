@@ -38,7 +38,7 @@ def evaluate_with_ollama(diff_content):
         Consider: 
         1. Code quality (30 points)
         2. Security (30 points)
-        3. Dry principle (10 points)
+        3. Code comments/documentation (10 points)
         4. Maintainability (10 points)
         5. Functionality (20 points)
     End your response with "SCORE: X/100" where X is the numerical score.
