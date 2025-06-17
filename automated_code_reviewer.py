@@ -30,17 +30,18 @@ def evaluate_with_ollama(diff_content):
         return "No changes found", 85
     
     prompt = f"""You are an expert code reviewer. Analyze the provided code changes and assign a score from 0-100 based on the weighted criteria below.
-        Ensure code is DRY (Don't Repeat Yourself)
-        Check for any security red flags
-        Make sure all code has docstrings and use style
-        Point out code that could be refactored
-        Watch out for code that could lead to GDPR violations
         Consider: 
         1. Code quality (30 points)
+            for eg-Ensure code is DRY (Don't Repeat Yourself)
         2. Security (30 points)
+            for eg- Check for any security red flags
+            -Watch out for code that could lead to GDPR violations
         3. Code comments/documentation (10 points)
+            for eg- Make sure all code has docstrings and use style
         4. Maintainability (10 points)
+            for eg- code is modular and handles exception properly with logging
         5. Functionality (20 points)
+            for eg- code works as intended and handles edge cases
     End your response with "SCORE: X/100" where X is the numerical score.
         
 Code changes:
