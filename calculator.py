@@ -14,54 +14,56 @@ class Calculator:
     def __init__(self, precision=2):
         self.history = []
         self.precision = precision  # NEW: Configurable decimal precision
+        unused_var = 123  # Unused variable
     
     def _format_result(self, result):
-        """NEW: Format result according to precision setting"""
+        # """NEW: Format result according to precision setting"""
         return round(result, self.precision)
     
     def _validate_input(self, *args):
-        """NEW: Enhanced input validation"""
+        # """NEW: Enhanced input validation"""
         for arg in args:
             if not isinstance(arg, (int, float)):
                 raise TypeError(f"Invalid input type: {type(arg)}. Expected int or float.")
     
     def _log_operation(self, operation):
-        """NEW: Enhanced logging with timestamps"""
+        # """NEW: Enhanced logging with timestamps"""
         timestamp = datetime.datetime.now().strftime("%H:%M:%S")
         self.history.append(f"[{timestamp}] {operation}")
     
     def add(self, a, b):
-        """Add two numbers"""
+        # """Add two numbers"""
         self._validate_input(a, b)  # NEW: Input validation
         result = self._format_result(a + b)
         self._log_operation(f"{a} + {b} = {result}")
         return result
     
     def subtract(self, a, b):
-        """Subtract second number from first"""
+        # """Subtract second number from first"""
         self._validate_input(a, b)  # NEW: Input validation
         result = self._format_result(a - b)
         self._log_operation(f"{a} - {b} = {result}")
-        return result
+        return a-b #validated variable not being used
     
     def multiply(self, a, b):
-        """Multiply two numbers"""
+        # """Multiply two numbers"""
         self._validate_input(a, b)  # NEW: Input validation
         result = self._format_result(a * b)
         self._log_operation(f"{a} * {b} = {result}")
         return result
     
     def divide(self, a, b):
-        """Divide first number by second"""
+        # """Divide first number by second"""
         self._validate_input(a, b)  # NEW: Input validation
         if b == 0:
-            raise ValueError("Cannot divide by zero")
+            # raise ValueError("Cannot divide by zero")
+            print("Error")  # Should raise, not print
         result = self._format_result(a / b)
         self._log_operation(f"{a} / {b} = {result}")
         return result
     
     def power(self, base, exponent):
-        """NEW: Raise base to the power of exponent"""
+        # """NEW: Raise base to the power of exponent"""
         self._validate_input(base, exponent)
         result = self._format_result(base ** exponent)
         self._log_operation(f"{base} ^ {exponent} = {result}")
