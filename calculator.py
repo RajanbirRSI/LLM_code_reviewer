@@ -56,6 +56,7 @@ class Calculator:
         self._validate_input(a, b)  # NEW: Input validation
         if b == 0:
             raise ValueError("Cannot divide by zero")
+            # print("Error")  # Should raise, not print
         result = self._format_result(a / b)
         self._log_operation(f"{a} / {b} = {result}")
         return result
