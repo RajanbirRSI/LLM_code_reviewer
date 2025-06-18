@@ -30,18 +30,34 @@ jobs:
       with:
         fetch-depth: 0  # Fetch full history
         ref: ${{ github.head_ref }}
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
-    
-    - name: Install Ollama
+        
+    - name: Display system info
       run: |
-        curl -fsSL https://ollama.ai/install.sh | sh
-        sudo systemctl start ollama
-        sleep 10
-        ollama pull mistral
+        echo "Runner OS: $env:OS"
+        echo "Runner Architecture: $env:PROCESSOR_ARCHITECTURE"
+        echo "PowerShell Version: $($PSVersionTable.PSVersion)"
+        echo "Current Directory: $(Get-Location)"
+        systeminfo | findstr /B /C:"OS Name" /C:"OS Version"
+      
+    - name: Check available tools
+      run: |
+        # Check if common tools are available
+        python --version 2>$null || echo "Python not found"
+        node --version 2>$null || echo "Node.js not found"
+        git --version 2>$null || echo "Git not found"
+        docker --version 2>$null || echo "Docker not found"
+    
+    # - name: Set up Python
+    #   uses: actions/setup-python@v4
+    #   with:
+    #     python-version: '3.9'
+    
+    # - name: Install Ollama
+    #   run: |
+    #     curl -fsSL https://ollama.ai/install.sh | sh
+    #     sudo systemctl start ollama
+    #     sleep 10
+    #     ollama pull mistral
     
     - name: Install Python dependencies
       run: |
