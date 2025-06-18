@@ -39,10 +39,10 @@ jobs:
         echo "Current Directory: $(Get-Location)"
         systeminfo | findstr /B /C:"OS Name" /C:"OS Version"
     
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.9'
+    # - name: Set up Python
+    #   uses: actions/setup-python@v4
+    #   with:
+    #     python-version: '3.9'
     
     # - name: Install Ollama
     #   run: |
