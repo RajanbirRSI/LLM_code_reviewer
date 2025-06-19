@@ -6,6 +6,7 @@ Simplified Code Reviewer - Check differences and evaluate with Ollama
 import subprocess
 import re
 import sys
+import sys
 
 def get_code_diff(branch_name="demo_test"):
     """Get diff between current branch and main branch"""
@@ -93,7 +94,7 @@ def extract_score(response):
 
 def main():
     """Main function"""
-    print("🔍 Checking for code differences...")
+    print("Checking for code differences...")
     
     # Get differences
     diff_content = get_code_diff()
@@ -108,11 +109,11 @@ def main():
     review_result, score = evaluate_with_ollama(diff_content)
     
     # Display results
-    print("\n📋 Review Results:")
+    print("\nReview Results:")
     print("=" * 50)
     print(review_result)
     print("=" * 50)
-    print(f"🎯 Score: {score}/100")
+    print(f"Score: {score}/100")
     
     # Store results in variables for further use
     return {
