@@ -23,11 +23,11 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up Python
-        shell: bash  # Use Bash
-        run: |
-          python --version
-          pip --version
+      # - name: Set up Python
+      #   shell: bash  # Use Bash
+      #   run: |
+      #     python --version
+      #     pip --version
 
       - name: Install dependencies
         shell: bash
