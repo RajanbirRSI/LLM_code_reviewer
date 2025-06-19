@@ -66,35 +66,86 @@ jobs:
 
       - name: Run automated code reviewer
         id: code-review
-        # shell: bash  # Your original bash syntax works here
+        shell: bash  # Your original bash syntax works here
         run: |
-          # Run the Python script and capture output
-          python automated_code_reviewer.py > review_output.txt 2>&1
+          echo "=== Running Code Review ==="
           
-          # Extract score from output file
+          # Run the Python script with explicit error handling
+          set +e  # Don't exit on error immediately
+          python automated_code_reviewer.py > review_output.txt 2>&1
+          python_exit_code=$?
+          set -e  # Re-enable exit on error
+          
+          echo "Python script exit code: $python_exit_code"
+          
+          # Always show what was captured
           if [ -f "review_output.txt" ]; then
+            echo "=== Review Output Content ==="
             cat review_output.txt
-            
-            # Your original bash logic (modify as needed based on your script output)
-            SCORE=$(grep -oP "(?:Overall Score|Score):\s*\K\d+" review_output.txt || echo "0")
-            
-            if [ -z "$SCORE" ]; then
-              echo "Could not extract score, defaulting to 0"
-              SCORE=0
-            fi
-            
-            echo "score=$SCORE" >> $GITHUB_OUTPUT
-            echo "passed=$([ $SCORE -ge 75 ] && echo 'true' || echo 'false')" >> $GITHUB_OUTPUT
-            
-            echo "Extracted Score: $SCORE"
-            echo "Review Passed: $([ $SCORE -ge 75 ] && echo 'YES' || echo 'NO')"
+            echo "=== End of Review Output ==="
           else
-            echo "Review output file not found"
-            echo "score=0" >> $GITHUB_OUTPUT
-            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "❌ Review output file was not created!"
             exit 1
           fi
+          
+          # Check if Python script failed
+          if [ $python_exit_code -ne 0 ]; then
+            echo "❌ Python script failed with exit code: $python_exit_code"
+            # Don't exit here, try to extract score anyway
+          fi
+          
+          # Extract score using compatible grep (without -P flag)
+          # Try multiple patterns to match different output formats
+          SCORE=""
+          
+          # Pattern 1: "Overall Score: 85"
+          SCORE=$(grep -i "overall score" review_output.txt | grep -o '[0-9]\+' | head -1 || echo "")
+          
+          # Pattern 2: "Score: 85" 
+          if [ -z "$SCORE" ]; then
+            SCORE=$(grep -i "^score" review_output.txt | grep -o '[0-9]\+' | head -1 || echo "")
+          fi
+          
+          # Pattern 3: Any line ending with "/100"
+          if [ -z "$SCORE" ]; then
+            SCORE=$(grep -o '[0-9]\+/100' review_output.txt | grep -o '^[0-9]\+' | head -1 || echo "")
+          fi
+          
+          # Pattern 4: Any number between 0-100 (last resort)
+          if [ -z "$SCORE" ]; then
+            SCORE=$(grep -o '\b[0-9]\{1,3\}\b' review_output.txt | head -1 || echo "")
+            # Validate it's a reasonable score (0-100)
+            if [ ! -z "$SCORE" ] && ([ "$SCORE" -lt 0 ] || [ "$SCORE" -gt 100 ]); then
+              SCORE=""
+            fi
+          fi
+          
+          # Default score if nothing found
+          if [ -z "$SCORE" ]; then
+            echo "⚠️ Could not extract score from output, defaulting to 0"
+            SCORE=0
+          else
+            echo "✅ Extracted Score: $SCORE"
+          fi
+          
+          # Set outputs for next steps
+          echo "score=$SCORE" >> $GITHUB_OUTPUT
+          
+          # Determine pass/fail
+          if [ "$SCORE" -ge 75 ]; then
+            echo "passed=true" >> $GITHUB_OUTPUT
+            echo "✅ Review Passed: YES (Score: $SCORE/100)"
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "❌ Review Failed: NO (Score: $SCORE/100)"
+          fi
 
+      - name: Debug outputs
+        shell: bash
+        run: |
+          echo "=== Debug Outputs ==="
+          echo "Score output: ${{ steps.code-review.outputs.score }}"
+          echo "Passed output: ${{ steps.code-review.outputs.passed }}"
       # Rest of the steps remain the same as the PowerShell version
       - name: Comment on PR with review results
         if: always()
