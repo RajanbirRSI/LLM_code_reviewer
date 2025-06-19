@@ -12,7 +12,7 @@ on:
 
 jobs:
   code-review:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
@@ -30,26 +30,18 @@ jobs:
       with:
         fetch-depth: 0  # Fetch full history
         ref: ${{ github.head_ref }}
-        
-    - name: Display system info
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install Ollama
       run: |
-        echo "Runner OS: $env:OS"
-        echo "Runner Architecture: $env:PROCESSOR_ARCHITECTURE"
-        echo "PowerShell Version: $($PSVersionTable.PSVersion)"
-        echo "Current Directory: $(Get-Location)"
-        systeminfo | findstr /B /C:"OS Name" /C:"OS Version"
-    
-    # - name: Set up Python
-    #   uses: actions/setup-python@v4
-    #   with:
-    #     python-version: '3.9'
-    
-    # - name: Install Ollama
-    #   run: |
-    #     curl -fsSL https://ollama.ai/install.sh | sh
-    #     sudo systemctl start ollama
-    #     sleep 10
-    #     ollama pull mistral
+        curl -fsSL https://ollama.ai/install.sh | sh
+        sudo systemctl start ollama
+        sleep 10
+        ollama pull mistral
     
     - name: Install Python dependencies
       run: |
@@ -148,7 +140,7 @@ jobs:
 
   auto-merge:
     needs: code-review
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: needs.code-review.outputs.should-merge == 'true'
     permissions:
       contents: write
@@ -199,7 +191,7 @@ jobs:
 
   notify-failure:
     needs: code-review
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: needs.code-review.outputs.passed == 'false'
     
     steps:
