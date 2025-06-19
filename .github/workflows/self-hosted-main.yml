@@ -23,6 +23,11 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Check powershell is working
+        shell: pwsh
+        run: |
+         pwsh -Command "Write-Host 'PowerShell Core is working!'"
+         
       # - name: Set up Python
       #   shell: bash  # Use Bash
       #   run: |
