@@ -18,6 +18,7 @@ def get_code_diff(branch_name="demo_test"):
             ['git', 'diff', f'origin/main...origin/autotest-review'],
             capture_output=True,
             text=True,
+            encoding="utf-8",
             check=True
         )
         return result.stdout.strip()
