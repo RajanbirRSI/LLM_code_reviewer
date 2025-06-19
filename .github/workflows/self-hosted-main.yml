@@ -146,39 +146,39 @@ jobs:
           echo "=== Debug Outputs ==="
           echo "Score output: ${{ steps.code-review.outputs.score }}"
           echo "Passed output: ${{ steps.code-review.outputs.passed }}"
-      # Rest of the steps remain the same as the PowerShell version
-       - name: Comment on PR
-      if: github.event_name == 'pull_request'
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const score = ${{ steps.code-review.outputs.score }};
-          const passed = ${{ steps.code-review.outputs.passed }};
-          const shouldMerge = ${{ steps.check-merge.outputs.should-merge }};
-          
-          const status = passed ? '✅ PASSED' : '❌ FAILED';
-          const mergeStatus = shouldMerge ? '🔄 Auto-merge enabled' : '⏸️ Manual review required';
-          
-          const comment = `## 🤖 Automated Code Review Results
-          
-          **Score:** ${score}/100
-          **Status:** ${status}
-          **Action:** ${mergeStatus}
-          
-          ${passed ? 
-            '✅ Your code meets our quality standards!' : 
-            '❌ Please address the issues and push changes for re-review.'
-          }
-          
-          ---
-          *Minimum score required: 75/100*`;
-          
-          github.rest.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: comment
-          });
+
+      - name: Comment on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const score = ${{ steps.code-review.outputs.score }};
+            const passed = ${{ steps.code-review.outputs.passed }};
+            const shouldMerge = ${{ steps.check-merge.outputs.should-merge }};
+            
+            const status = passed ? '✅ PASSED' : '❌ FAILED';
+            const mergeStatus = shouldMerge ? '🔄 Auto-merge enabled' : '⏸️ Manual review required';
+            
+            const comment = `## 🤖 Automated Code Review Results
+            
+            **Score:** ${score}/100
+            **Status:** ${status}
+            **Action:** ${mergeStatus}
+            
+            ${passed ? 
+              '✅ Your code meets our quality standards!' : 
+              '❌ Please address the issues and push changes for re-review.'
+            }
+            
+            ---
+            *Minimum score required: 75/100*`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
 
   auto-merge:
     needs: code-review
