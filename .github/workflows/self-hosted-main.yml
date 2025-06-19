@@ -24,7 +24,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Python
-        shell: pwsh  # Use PowerShell for Windows-specific commands
+        shell: bash  # Use Bash
         run: |
           python --version
           pip --version
@@ -38,20 +38,15 @@ jobs:
           pip install requests PyGithub
 
       - name: Check Ollama service
-        shell: pwsh
+        shell: bash
         run: |
-          try {
-            ollama ps
-            Write-Host "Ollama is running"
-          } catch {
-            Write-Host "Starting Ollama service..."
-            Start-Process "ollama" -ArgumentList "serve" -WindowStyle Hidden
-            Start-Sleep 10
-            ollama ps
-          }
+          if ! ollama list | grep -q "mistral"; then
+            echo "Pulling Mistral model..."
+            ollama pull mistral
+          fi
 
       - name: Ensure required models are available
-        shell: pwsh
+        shell: bash
         run: |
           $models = ollama list
           if ($models -notmatch "mistral") {
