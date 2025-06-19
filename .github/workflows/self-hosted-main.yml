@@ -28,14 +28,14 @@ jobs:
         run: |
          pwsh -Command "Write-Host 'PowerShell Core is working!'"
          
-      # - name: Set up Python
-      #   shell: bash  # Use Bash
-      #   run: |
-      #     python --version
-      #     pip --version
+      - name: Check Python
+        shell: pwsh  # Use Bash
+        run: |
+          python --version
+          pip --version
 
       - name: Install dependencies
-        shell: bash
+        shell: pwsh
         run: |
           if [ -f "requirements.txt" ]; then
             pip install -r requirements.txt
@@ -43,15 +43,20 @@ jobs:
           pip install requests PyGithub
 
       - name: Check Ollama service
-        shell: bash
+        shell: pwsh
         run: |
-          if ! ollama list | grep -q "mistral"; then
-            echo "Pulling Mistral model..."
-            ollama pull mistral
-          fi
+          try {
+            ollama ps
+            Write-Host "Ollama is running"
+          } catch {
+            Write-Host "Starting Ollama service..."
+            Start-Process "ollama" -ArgumentList "serve" -WindowStyle Hidden
+            Start-Sleep 10
+            ollama ps
+          }
 
       - name: Ensure required models are available
-        shell: bash
+        shell: pwsh
         run: |
           $models = ollama list
           if ($models -notmatch "mistral") {
