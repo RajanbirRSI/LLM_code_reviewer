@@ -6,17 +6,19 @@ Simplified Code Reviewer - Check differences and evaluate with Ollama
 import subprocess
 import re
 import sys
+import sys
 
 def get_code_diff(branch_name="demo_test"):
     """Get diff between current branch and main branch"""
     try:
         # Fetch branches first (needed for GitHub Actions)
-        subprocess.run(['git', 'fetch', 'origin'], check=True, capture_output=True)
+        subprocess.run(['git', 'fetch', 'origin'], check=True, capture_output=True, encoding="utf-8")
 
         result = subprocess.run(
             ['git', 'diff', f'origin/main...origin/autotest-review'],
             capture_output=True,
             text=True,
+            encoding="utf-8",
             check=True
         )
         return result.stdout.strip()
@@ -52,9 +54,9 @@ Lastly if the score is less than expected theshold that is 75, provide improveme
 """
   
     try:
-        print("Analyzing with Mistral...")
+        print("Analyzing with Quantized llma 3.2 model...")
         result = subprocess.run(
-            ['ollama', 'run', 'mistral', prompt],
+            ['ollama', 'run', 'hf.co/bartowski/Llama-3.2-3B-Instruct-GGUF:IQ3_M', prompt],
             capture_output=True,
             text=True,
             check=True
@@ -93,7 +95,7 @@ def extract_score(response):
 
 def main():
     """Main function"""
-    print("🔍 Checking for code differences...")
+    print("Checking for code differences...")
     
     # Get differences
     diff_content = get_code_diff()
@@ -108,11 +110,11 @@ def main():
     review_result, score = evaluate_with_ollama(diff_content)
     
     # Display results
-    print("\n📋 Review Results:")
+    print("\nReview Results:")
     print("=" * 50)
     print(review_result)
     print("=" * 50)
-    print(f"🎯 Score: {score}/100")
+    print(f"Score: {score}/100")
     
     # Store results in variables for further use
     return {
