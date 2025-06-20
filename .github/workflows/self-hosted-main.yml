@@ -59,9 +59,13 @@ jobs:
         shell: pwsh
         run: |
           $models = ollama list
-          if ($models -notmatch "mistral") {
-            Write-Host "Pulling Mistral model..."
-            ollama pull mistral
+          # if ($models -notmatch "mistral") {
+          #   Write-Host "Pulling Mistral model..."
+          #   ollama pull mistral
+          # }
+          if ($models -notmatch "hf.co/bartowski/Llama-3.2-3B-Instruct-GGUF:IQ3_M") {
+            Write-Host "Pulling Llama 3.2 quantized model..."
+            ollama pull hf.co/bartowski/Llama-3.2-3B-Instruct-GGUF:IQ3_M 
           }
 
       - name: Run automated code reviewer
