@@ -54,9 +54,9 @@ Lastly if the score is less than expected theshold that is 75, provide improveme
 """
   
     try:
-        print("Analyzing with Mistral...")
+        print("Analyzing with Quantized llma 3.2 model...")
         result = subprocess.run(
-            ['ollama', 'run', 'mistral', prompt],
+            ['ollama', 'run', 'hf.co/bartowski/Llama-3.2-3B-Instruct-GGUF:IQ3_M', prompt],
             capture_output=True,
             text=True,
             check=True
