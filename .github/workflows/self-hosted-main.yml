@@ -105,14 +105,11 @@ jobs:
           # Pattern 1: "Overall Score: 85"
           SCORE=$(grep -i "overall score" review_output.txt | grep -o '[0-9]\+' | head -1 || echo "")
           
-          # Pattern 2: "Score: 85" 
           if [ -z "$SCORE" ]; then
-            SCORE=$(grep -i "^score" review_output.txt | grep -o '[0-9]\+' | head -1 || echo "")
+            SCORE=$(grep -E -i 'score:? ?[0-9]+/100' review_output.txt | grep -o '[0-9]\+' | tail -1 || echo "")
           fi
-          
-          # Pattern 3: Any line ending with "/100"
           if [ -z "$SCORE" ]; then
-            SCORE=$(grep -o '[0-9]\+/100' review_output.txt | grep -o '^[0-9]\+' | head -1 || echo "")
+            SCORE=$(grep -o '[0-9]\+/100' review_output.txt | grep -o '^[0-9]\+' | tail -1 || echo "")
           fi
           
           # Default score if nothing found
