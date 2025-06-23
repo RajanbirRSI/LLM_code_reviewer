@@ -7,6 +7,8 @@ import subprocess
 import re
 import sys
 import sys
+import os
+os.environ["PYTHONIOENCODING"] = "utf-8"
 
 def get_code_diff(branch_name="demo_test"):
     """Get diff between current branch and main branch"""
@@ -54,9 +56,10 @@ Lastly if the score is less than expected theshold that is 75, provide improveme
 """
   
     try:
-        print("Analyzing with Quantized llma 3.2 model...")
+        print("Analyzing with Mistral model...")
         result = subprocess.run(
-            ['ollama', 'run', 'hf.co/bartowski/Llama-3.2-3B-Instruct-GGUF:IQ3_M', prompt],
+            # ['ollama', 'run', 'hf.co/bartowski/Llama-3.2-3B-Instruct-GGUF:IQ3_M', prompt],
+            ['ollama', 'run', 'mistral', prompt],
             capture_output=True,
             text=True,
             check=True
