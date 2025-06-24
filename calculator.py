@@ -20,7 +20,7 @@ class Calculator:
         return round(result, self.precision)
     
     def _validate_input(self, *args):
-        # """NEW: Enhanced input validation"""
+        """NEW: Enhanced input validation"""
         for arg in args:
             if not isinstance(arg, (int, float)):
                 raise TypeError(f"Invalid input type: {type(arg)}. Expected int or float.")
@@ -52,24 +52,24 @@ class Calculator:
         return result
     
     def divide(self, a, b):
-        # """Divide first number by second"""
+        """Divide first number by second"""
         self._validate_input(a, b)  # NEW: Input validation
         if b == 0:
             raise ValueError("Cannot divide by zero")
-            # print("Error")  # Should raise, not print
+            print("Error")  # Should raise, not print
         result = self._format_result(a / b)
         self._log_operation(f"{a} / {b} = {result}")
         return result
     
     def power(self, base, exponent):
-        # """NEW: Raise base to the power of exponent"""
+        """NEW: Raise base to the power of exponent"""
         self._validate_input(base, exponent)
         result = self._format_result(base ** exponent)
         self._log_operation(f"{base} ^ {exponent} = {result}")
         return result
     
     def square_root(self, number):
-        # """NEW: Calculate square root of a number"""
+        """NEW: Calculate square root of a number"""
         self._validate_input(number)
         if number < 0:
             raise ValueError("Cannot calculate square root of negative number")
