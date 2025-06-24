@@ -6,13 +6,17 @@ Simplified Code Reviewer - Check differences and evaluate with Ollama
 import subprocess
 import re
 import sys
-import sys
+import os
+import io
+os.environ["PYTHONIOENCODING"] = "utf-8"
+sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding='utf-8', line_buffering=True)
+sys.stderr = io.TextIOWrapper(sys.stderr.detach(), encoding='utf-8', line_buffering=True)
 
 def get_code_diff(branch_name="demo_test"):
     """Get diff between current branch and main branch"""
     try:
         # Fetch branches first (needed for GitHub Actions)
-        subprocess.run(['git', 'fetch', 'origin'], check=True, capture_output=True, encoding="utf-8")
+        subprocess.run(['git', 'fetch', 'origin'], text=True, check=True, capture_output=True, encoding="utf-8")
 
         result = subprocess.run(
             ['git', 'diff', f'origin/main...origin/autotest-review'],
@@ -44,22 +48,27 @@ def evaluate_with_ollama(diff_content):
             for eg- code is modular and handles exception properly with logging
         5. Functionality (20 points)
             for eg- code works as intended and handles edge cases
-    End your response with "SCORE: X/100" where X is the numerical score.
         
 Code changes:
 ```diff
 {diff_content}
 ```\
-Lastly if the score is less than expected theshold that is 75, provide improvements in the code that should be done according to the metrics provided above so that score passes the excpected threshold
+
+End your response with "SCORE: X/100" where X is the numerical score.
 """
+#Lastly if the score is less than expected theshold that is 75, provide improvements in the code that should be done according to the metrics provided above so that score passes the excpected threshold
   
     try:
-        print("Analyzing with Quantized llma 3.2 model...")
+        print("Analyzing with Mistral Quantized 4 bit model...")
         result = subprocess.run(
-            ['ollama', 'run', 'hf.co/bartowski/Llama-3.2-3B-Instruct-GGUF:IQ3_M', prompt],
+            # ['ollama', 'run', 'hf.co/bartowski/Llama-3.2-3B-Instruct-GGUF:IQ3_M', prompt],
+            # ['ollama', 'run', 'mistral', prompt],
+            ['ollama', 'run', 'mistral:7b-instruct-q4_0', prompt],
+
             capture_output=True,
             text=True,
-            check=True
+            check=True,
+            encoding="utf-8"
         )
         
         response = result.stdout.strip()
@@ -91,7 +100,7 @@ def extract_score(response):
             if 0 <= score <= 100:
                 return score
     
-    return 70  # Default score
+    return 75  # Default score
 
 def main():
     """Main function"""
