@@ -132,7 +132,32 @@ jobs:
           echo "=== Debug Outputs ==="
           echo "Score output: ${{ steps.code-review.outputs.score }}"
           echo "Passed output: ${{ steps.code-review.outputs.passed }}"
-
+          
+      - name: Check merge conditions
+        id: check-merge
+        run: |
+          SCORE=${{ steps.code-review.outputs.score }}
+          PASSED=${{ steps.code-review.outputs.passed }}
+          
+          MIN_SCORE=75
+          IS_PR=${{ github.event_name == 'pull_request' }}
+          
+          echo "Score: $SCORE"
+          echo "Passed: $PASSED"
+          echo "Is PR: $IS_PR"
+          echo "Min Score Required: $MIN_SCORE"
+          
+          if [ "$PASSED" = "true" ] && [ "$IS_PR" = "true" ] && [ "$SCORE" -ge "$MIN_SCORE" ]; then
+            echo "should-merge=true" >> $GITHUB_OUTPUT
+            echo "✅ All conditions met for auto-merge"
+          else
+            echo "should-merge=false" >> $GITHUB_OUTPUT
+            echo "❌ Conditions not met for auto-merge"
+            echo "  - Score >= $MIN_SCORE: $([ $SCORE -ge $MIN_SCORE ] && echo '✅' || echo '❌')"
+            echo "  - Is Pull Request: $([ "$IS_PR" = "true" ] && echo '✅' || echo '❌')"
+            echo "  - Review Passed: $([ "$PASSED" = "true" ] && echo '✅' || echo '❌')"
+          fi
+          
       - name: Comment on PR
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
