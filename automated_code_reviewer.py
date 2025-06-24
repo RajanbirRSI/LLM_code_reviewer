@@ -67,7 +67,6 @@ End your response with "SCORE: X/100" where X is the numerical score.
             capture_output=True,
             text=True,
             check=True,
-            encoding="utf-8",
         )
         
         response = result.stdout.strip()
