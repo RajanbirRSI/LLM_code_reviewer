@@ -61,8 +61,8 @@ Lastly if the score is less than expected theshold that is 75, provide improveme
         print("Analyzing with Mistral Quantized 4 bit model...")
         result = subprocess.run(
             # ['ollama', 'run', 'hf.co/bartowski/Llama-3.2-3B-Instruct-GGUF:IQ3_M', prompt],
-            # ['ollama', 'run', 'mistral', prompt],
-            ['ollama', 'run', 'mistral:7b-instruct-q4_0', prompt],
+            ['ollama', 'run', 'mistral', prompt],
+            # ['ollama', 'run', 'mistral:7b-instruct-q4_0', prompt],
             capture_output=True,
             text=True,
             check=True,
