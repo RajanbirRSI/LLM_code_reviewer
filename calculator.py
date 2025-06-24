@@ -100,21 +100,21 @@ class Calculator:
 
 def main():
     """Enhanced demo function to test the calculator"""
-    calc = Calculator(precision=2)  # CHANGED: Set precision to 3 decimal places
+    calc = Calculator(precision=2)  # CHANGED: Set precision to 2 decimal places
     
-    # print("Enhanced Calculator Demo")
-    # print("=" * 30)
+    print("Enhanced Calculator Demo")
+    print("=" * 30)
     
-    # # Original calculations
-    # print(f"5 + 3 = {calc.add(5, 3)}")
-    # print(f"10 - 4 = {calc.subtract(10, 4)}")
-    # print(f"6 * 7 = {calc.multiply(6, 7)}")
-    # print(f"15 / 3 = {calc.divide(15, 3)}")
+    # Original calculations
+    print(f"5 + 3 = {calc.add(5, 3)}")
+    print(f"10 - 4 = {calc.subtract(10, 4)}")
+    print(f"6 * 7 = {calc.multiply(6, 7)}")
+    print(f"15 / 3 = {calc.divide(15, 3)}")
     
-    # # NEW: Advanced calculations
-    # print(f"2 ^ 8 = {calc.power(2, 8)}")
-    # print(f"√16 = {calc.square_root(16)}")
-    # print(f"15% of 200 = {calc.percentage(200, 15)}")
+    # NEW: Advanced calculations
+    print(f"2 ^ 8 = {calc.power(2, 8)}")
+    print(f"√16 = {calc.square_root(16)}")
+    print(f"15% of 200 = {calc.percentage(200, 15)}")
     
     print("\nCalculation History:")
     for entry in calc.get_history():
