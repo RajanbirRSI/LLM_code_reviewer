@@ -98,7 +98,7 @@ def extract_score(response):
             if 0 <= score <= 100:
                 return score
     
-    return 70  # Default score
+    return 75  # Default score
 
 def main():
     """Main function"""
