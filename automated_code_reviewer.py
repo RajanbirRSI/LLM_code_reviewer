@@ -48,14 +48,15 @@ def evaluate_with_ollama(diff_content):
             for eg- code is modular and handles exception properly with logging
         5. Functionality (20 points)
             for eg- code works as intended and handles edge cases
-    End your response with "SCORE: X/100" where X is the numerical score.
         
 Code changes:
 ```diff
 {diff_content}
 ```\
-Lastly if the score is less than expected theshold that is 75, provide improvements in the code that should be done according to the metrics provided above so that score passes the excpected threshold
+
+End your response with "SCORE: X/100" where X is the numerical score.
 """
+#Lastly if the score is less than expected theshold that is 75, provide improvements in the code that should be done according to the metrics provided above so that score passes the excpected threshold
   
     try:
         print("Analyzing with Mistral Quantized 4 bit model...")
