@@ -6,9 +6,11 @@ Simplified Code Reviewer - Check differences and evaluate with Ollama
 import subprocess
 import re
 import sys
-import sys
 import os
+import io
 os.environ["PYTHONIOENCODING"] = "utf-8"
+sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding='utf-8', line_buffering=True)
+sys.stderr = io.TextIOWrapper(sys.stderr.detach(), encoding='utf-8', line_buffering=True)
 
 def get_code_diff(branch_name="demo_test"):
     """Get diff between current branch and main branch"""
@@ -116,8 +118,7 @@ def main():
     # Display results
     print("\nReview Results:")
     print("=" * 50)
-    # print(review_result)
-    print(review_result.encode('utf-8', errors='replace').decode('utf-8'))
+    print(review_result)
     print("=" * 50)
     print(f"Score: {score}/100")
     
