@@ -65,7 +65,8 @@ Lastly if the score is less than expected theshold that is 75, provide improveme
             ['ollama', 'run', 'mistral:7b-instruct-q4_0', prompt],
             capture_output=True,
             text=True,
-            check=True
+            check=True,
+            encoding="utf-8",
         )
         
         response = result.stdout.strip()
