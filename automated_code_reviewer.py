@@ -117,7 +117,8 @@ def main():
     # Display results
     print("\nReview Results:")
     print("=" * 50)
-    print(review_result)
+    # print(review_result)
+    print(review_result.encode('utf-8', errors='replace').decode('utf-8'))
     print("=" * 50)
     print(f"Score: {score}/100")
     
