@@ -102,8 +102,8 @@ def main():
     """Enhanced demo function to test the calculator"""
     calc = Calculator(precision=2)  # CHANGED: Set precision to 3 decimal places
     
-    print("Enhanced Calculator Demo")
-    print("=" * 30)
+    # print("Enhanced Calculator Demo")
+    # print("=" * 30)
     
     # # Original calculations
     # print(f"5 + 3 = {calc.add(5, 3)}")
