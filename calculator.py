@@ -7,6 +7,12 @@
 
 import math
 import datetime
+import logging
+from typing import List, Union
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 class Calculator:
     """An enhanced calculator class with basic and advanced operations"""
@@ -125,11 +131,13 @@ def main():
     try:
         calc.divide(10, 0)
     except ValueError as e:
+        logger.error(f"Division error: {e}")
         print(f"  Error caught: {e}")
     
     try:
         calc.square_root(-4)
     except ValueError as e:
+        logger.error(f"Square roor error: {e}")
         print(f"  Error caught: {e}")
 
 if __name__ == "__main__":
