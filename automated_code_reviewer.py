@@ -64,7 +64,8 @@ End your response with "SCORE: X/100" where X is the numerical score.
             # ['ollama', 'run', 'hf.co/bartowski/Llama-3.2-3B-Instruct-GGUF:IQ3_M', prompt],
             # ['ollama', 'run', 'mistral', prompt],
             # ['ollama', 'run', 'mistral:7b-instruct-q4_0', prompt],
-            ['ollama', 'run', 'llama3.2:1b', prompt],
+            # ['ollama', 'run', 'llama3.2:1b', prompt],
+            ['ollama', 'run', 'phi3:mini', prompt],
 
             capture_output=True,
             text=True,
