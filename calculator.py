@@ -37,28 +37,68 @@ class Calculator:
         self.history.append(f"[{timestamp}] {operation}")
     
     def add(self, a, b):
-        """Add two numbers"""
+        """
+        Add two numbers
+        
+        Args:
+            a: First number
+            b: Second number
+            
+        Returns:
+            Sum of a and b
+        """
         self._validate_input(a, b)  # NEW: Input validation
         result = self._format_result(a + b)
         self._log_operation(f"{a} + {b} = {result}")
         return result
     
     def subtract(self, a, b):
-        """Subtract second number from first"""
+        """
+        Subtract b from a
+        
+        Args:
+            a: First number
+            b: Second number
+            
+        Returns:
+            Difference of a and b
+        """
         self._validate_input(a, b)  # NEW: Input validation
         result = self._format_result(a - b)
         self._log_operation(f"{a} - {b} = {result}")
         return result
     
     def multiply(self, a, b):
-        """Multiply two numbers"""
+        """
+        Multiply two numbers
+        
+        Args:
+            a: First number
+            b: Second number
+            
+        Returns:
+            Product of a and b
+        """
         self._validate_input(a, b)  # NEW: Input validation
         result = self._format_result(a * b)
         self._log_operation(f"{a} * {b} = {result}")
         return result
     
     def divide(self, a, b):
-        """Divide first number by second"""
+       """
+        Divide a by b
+        
+        Args:
+            a: Dividend
+            b: Divisor
+            
+        Returns:
+            Quotient of a and b
+            
+        Raises:
+            ValueError: If b is zero
+            TypeError: If arguments are not numbers
+        """
         self._validate_input(a, b)  # NEW: Input validation
         if b == 0:
             raise ValueError("Cannot divide by zero")
