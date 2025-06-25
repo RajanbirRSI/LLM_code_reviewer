@@ -20,7 +20,13 @@ jobs:
     defaults:
       run:
         shell: bash
-    
+        
+    # Add job-level outputs that reference step outputs
+    outputs:
+      score: ${{ steps.code-review.outputs.score }}
+      passed: ${{ steps.code-review.outputs.passed }}
+      should-merge: ${{ steps.check-merge.outputs.should-merge }}
+      
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
