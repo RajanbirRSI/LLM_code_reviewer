@@ -7,7 +7,7 @@ on:
   #     - main
   pull_request:
     branches:
-      - main
+      - demo #added random name so that worflow doesn't trigger
     types: [opened, synchronize, reopened]
 
 jobs:
