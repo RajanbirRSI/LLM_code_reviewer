@@ -1,9 +1,12 @@
-#!/usr/bin/env python3
-"""
-Simple Calculator Module
-A basic calculator with arithmetic operations and enhanced features
-"""
+# calculator.py - Enhanced Calculator Demo
+# Updated version with advanced operations and input validation
+# CHANGES: Added power, square root, and percentage operations
+# CHANGES: Enhanced error handling and input validation
+# CHANGES: Added configuration for decimal precision
+# CHANGES: Modified history format to include timestamps
 
+import math
+import datetime
 import logging
 from typing import List, Union
 
@@ -12,14 +15,28 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class Calculator:
-    """A simple calculator class with enhanced error handling and features"""
+    """An enhanced calculator class with basic and advanced operations"""
     
-    def __init__(self):
-        """Initialize calculator"""
-        self.history: List[str] = []
-        logger.info("Calculator initialized")
+    def __init__(self, precision=2):
+        self.history = []
+        self.precision = precision  # NEW: Configurable decimal precision
     
-    def add(self, a: Union[int, float], b: Union[int, float]) -> Union[int, float]:
+    def _format_result(self, result):
+        """NEW: Format result according to precision setting"""
+        return round(result, self.precision)
+    
+    def _validate_input(self, *args):
+        """NEW: Enhanced input validation"""
+        for arg in args:
+            if not isinstance(arg, (int, float)):
+                raise TypeError(f"Invalid input type: {type(arg)}. Expected int or float.")
+    
+    def _log_operation(self, operation):
+        """NEW: Enhanced logging with timestamps"""
+        timestamp = datetime.datetime.now().strftime("%H:%M:%S")
+        self.history.append(f"[{timestamp}] {operation}")
+    
+    def add(self, a, b):
         """
         Add two numbers
         
@@ -30,16 +47,12 @@ class Calculator:
         Returns:
             Sum of a and b
         """
-        if not isinstance(a, (int, float)) or not isinstance(b, (int, float)):
-            raise TypeError("Arguments must be numbers")
-            
-        result = a + b
-        operation = f"{a} + {b} = {result}"
-        self.history.append(operation)
-        logger.debug(f"Addition performed: {operation}")
+        self._validate_input(a, b)  # NEW: Input validation
+        result = self._format_result(a + b)
+        self._log_operation(f"{a} + {b} = {result}")
         return result
     
-    def subtract(self, a: Union[int, float], b: Union[int, float]) -> Union[int, float]:
+    def subtract(self, a, b):
         """
         Subtract b from a
         
@@ -50,16 +63,12 @@ class Calculator:
         Returns:
             Difference of a and b
         """
-        if not isinstance(a, (int, float)) or not isinstance(b, (int, float)):
-            raise TypeError("Arguments must be numbers")
-            
-        result = a - b
-        operation = f"{a} - {b} = {result}"
-        self.history.append(operation)
-        logger.debug(f"Subtraction performed: {operation}")
+        self._validate_input(a, b)  # NEW: Input validation
+        result = self._format_result(a - b)
+        self._log_operation(f"{a} - {b} = {result}")
         return result
     
-    def multiply(self, a: Union[int, float], b: Union[int, float]) -> Union[int, float]:
+    def multiply(self, a, b):
         """
         Multiply two numbers
         
@@ -70,17 +79,13 @@ class Calculator:
         Returns:
             Product of a and b
         """
-        if not isinstance(a, (int, float)) or not isinstance(b, (int, float)):
-            raise TypeError("Arguments must be numbers")
-            
-        result = a * b
-        operation = f"{a} * {b} = {result}"
-        self.history.append(operation)
-        logger.debug(f"Multiplication performed: {operation}")
+        self._validate_input(a, b)  # NEW: Input validation
+        result = self._format_result(a * b)
+        self._log_operation(f"{a} * {b} = {result}")
         return result
     
-    def divide(self, a: Union[int, float], b: Union[int, float]) -> float:
-        """
+    def divide(self, a, b):
+       """
         Divide a by b
         
         Args:
@@ -94,88 +99,86 @@ class Calculator:
             ValueError: If b is zero
             TypeError: If arguments are not numbers
         """
-        if not isinstance(a, (int, float)) or not isinstance(b, (int, float)):
-            raise TypeError("Arguments must be numbers")
-            
+        self._validate_input(a, b)  # NEW: Input validation
         if b == 0:
-            logger.error("Attempted division by zero")
             raise ValueError("Cannot divide by zero")
-            
-        result = a / b
-        operation = f"{a} / {b} = {result}"
-        self.history.append(operation)
-        logger.debug(f"Division performed: {operation}")
+            print("Error")  # Should raise, not print
+        result = self._format_result(a / b)
+        self._log_operation(f"{a} / {b} = {result}")
         return result
     
-    def power(self, base: Union[int, float], exponent: Union[int, float]) -> Union[int, float]:
-        """
-        Calculate base raised to the power of exponent
-        
-        Args:
-            base: Base number
-            exponent: Exponent
-            
-        Returns:
-            base^exponent
-        """
-        if not isinstance(base, (int, float)) or not isinstance(exponent, (int, float)):
-            raise TypeError("Arguments must be numbers")
-            
-        result = base ** exponent
-        operation = f"{base} ^ {exponent} = {result}"
-        self.history.append(operation)
-        logger.debug(f"Power operation performed: {operation}")
+    def power(self, base, exponent):
+        """NEW: Raise base to the power of exponent"""
+        self._validate_input(base, exponent)
+        result = self._format_result(base ** exponent)
+        self._log_operation(f"{base} ^ {exponent} = {result}")
         return result
     
-    def get_history(self) -> List[str]:
-        """
-        Get calculation history
-        
-        Returns:
-            Copy of calculation history
-        """
-        return self.history.copy()
+    def square_root(self, number):
+        """NEW: Calculate square root of a number"""
+        self._validate_input(number)
+        if number < 0:
+            raise ValueError("Cannot calculate square root of negative number")
+        result = self._format_result(math.sqrt(number))
+        self._log_operation(f"√{number} = {result}")
+        return result
     
-    def clear_history(self) -> None:
+    def percentage(self, value, percentage):
+        """NEW: Calculate percentage of a value"""
+        self._validate_input(value, percentage)
+        result = self._format_result((value * percentage) / 100)
+        self._log_operation(f"{percentage}% of {value} = {result}")
+        return result
+    
+    def get_history(self):
+        """Return calculation history"""
+        return self.history
+    
+    def clear_history(self):
         """Clear calculation history"""
-        self.history.clear()
-        logger.info("Calculator history cleared")
+        self.history = []
     
-    def get_last_result(self) -> str:
-        """
-        Get the last calculation result
-        
-        Returns:
-            Last calculation or empty string if no history
-        """
-        return self.history[-1] if self.history else ""
+    def set_precision(self, precision):
+        """NEW: Set decimal precision for results"""
+        if not isinstance(precision, int) or precision < 0:
+            raise ValueError("Precision must be a non-negative integer")
+        self.precision = precision
 
 def main():
-    """Main function for testing"""
-    calc = Calculator()
+    """Enhanced demo function to test the calculator"""
+    calc = Calculator(precision=2)  # CHANGED: Set precision to 2 decimal places
     
-    print("Enhanced Calculator Test")
-    print("========================")
+    print("Enhanced Calculator Demo")
+    print("=" * 30)
+    
+    # Original calculations
+    print(f"5 + 3 = {calc.add(5, 3)}")
+    print(f"10 - 4 = {calc.subtract(10, 4)}")
+    print(f"6 * 7 = {calc.multiply(6, 7)}")
+    print(f"15 / 3 = {calc.divide(15, 3)}")
+    
+    # NEW: Advanced calculations
+    print(f"2 ^ 8 = {calc.power(2, 8)}")
+    print(f"√16 = {calc.square_root(16)}")
+    print(f"15% of 200 = {calc.percentage(200, 15)}")
+    
+    print("\nCalculation History:")
+    for entry in calc.get_history():
+        print(f"  {entry}")
+    
+    # NEW: Test error handling
+    print("\nTesting error handling:")
+    try:
+        calc.divide(10, 0)
+    except ValueError as e:
+        logger.error(f"Division error: {e}")
+        print(f"  Error caught: {e}")
     
     try:
-        # Test basic operations with error handling
-        print(f"5 + 3 = {calc.add(5, 3)}")
-        print(f"10 - 4 = {calc.subtract(10, 4)}")
-        print(f"6 * 7 = {calc.multiply(6, 7)}")
-        print(f"15 / 3 = {calc.divide(15, 3)}")
-        print(f"2 ^ 3 = {calc.power(2, 3)}")
-        
-        # Test new feature
-        print(f"Last result: {calc.get_last_result()}")
-        
-        # Show history
-        print("\nCalculation History:")
-        for operation in calc.get_history():
-            print(f"  {operation}")
-            
-    except (ValueError, TypeError) as e:
-        logger.error(f"Calculation error: {e}")
-        print(f"Error: {e}")
+        calc.square_root(-4)
+    except ValueError as e:
+        logger.error(f"Square roor error: {e}")
+        print(f"  Error caught: {e}")
 
 if __name__ == "__main__":
     main()
