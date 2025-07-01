@@ -1,184 +1,138 @@
-# calculator.py - Enhanced Calculator Demo
-# Updated version with advanced operations and input validation
-# CHANGES: Added power, square root, and percentage operations
-# CHANGES: Enhanced error handling and input validation
-# CHANGES: Added configuration for decimal precision
-# CHANGES: Modified history format to include timestamps
+#!/usr/bin/env python3
+"""
+Simplified Code Reviewer - Check differences and evaluate with Ollama
+"""
 
-import math
-import datetime
-import logging
-from typing import List, Union
+import subprocess
+import re
+import sys
+import os
+import io
+os.environ["PYTHONIOENCODING"] = "utf-8"
+sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding='utf-8', line_buffering=True)
+sys.stderr = io.TextIOWrapper(sys.stderr.detach(), encoding='utf-8', line_buffering=True)
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+def get_code_diff(branch_name="demo_test"):
+    """Get diff between current branch and main branch"""
+    try:
+        # Fetch branches first (needed for GitHub Actions)
+        subprocess.run(['git', 'fetch', 'origin'], text=True, check=True, capture_output=True, encoding="utf-8")
 
-class Calculator:
-    """An enhanced calculator class with basic and advanced operations"""
+        result = subprocess.run(
+            ['git', 'diff', f'origin/main...origin/autotest-review'],
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            check=True
+        )
+        return result.stdout.strip()
+    except Exception as e:
+        print(f"Error getting diff: {e}")
+        return ""
+
+def evaluate_with_ollama(diff_content):
+    """Send diff to Ollama Mistral for evaluation"""
+    if not diff_content:
+        return "No changes found", 85
     
-    def __init__(self, precision=2):
-        self.history = []
-        self.precision = precision  # NEW: Configurable decimal precision
-    
-    def _format_result(self, result):
-        """NEW: Format result according to precision setting"""
-        return round(result, self.precision)
-    
-    def _validate_input(self, *args):
-        """NEW: Enhanced input validation"""
-        for arg in args:
-            if not isinstance(arg, (int, float)):
-                raise TypeError(f"Invalid input type: {type(arg)}. Expected int or float.")
-    
-    def _log_operation(self, operation):
-        """NEW: Enhanced logging with timestamps"""
-        timestamp = datetime.datetime.now().strftime("%H:%M:%S")
-        self.history.append(f"[{timestamp}] {operation}")
-    
-    def add(self, a, b):
-        """
-        Add two numbers
+    prompt = f"""You are an expert code reviewer. Analyze the provided code changes and assign a score from 0-100 based on the weighted criteria below.
+        Consider: 
+        1. Code quality (30 points)
+            for eg-Ensure code is DRY (Don't Repeat Yourself)
+        2. Security (30 points)
+            for eg- Check for any security red flags
+            -Watch out for code that could lead to GDPR violations
+        3. Code comments/documentation (10 points)
+            for eg- Make sure all code has docstrings and use style
+        4. Maintainability (10 points)
+            for eg- code is modular and handles exception properly with logging
+        5. Functionality (20 points)
+            for eg- code works as intended and handles edge cases
         
-        Args:
-            a: First number
-            b: Second number
-            
-        Returns:
-            Sum of a and b
-        """
-        self._validate_input(a, b)  # NEW: Input validation
-        result = self._format_result(a + b)
-        self._log_operation(f"{a} + {b} = {result}")
-        return result
-    
-    def subtract(self, a, b):
-        """
-        Subtract b from a
+Code changes:
+```diff
+{diff_content}
+```\
+
+End your response with "SCORE: X/100" where X is the numerical score.
+"""
+#Lastly if the score is less than expected theshold that is 75, provide improvements in the code that should be done according to the metrics provided above so that score passes the excpected threshold
+  
+    try:
+        print("Analyzing with Mistral Quantized 4 bit model...")
+        result = subprocess.run(
+            # ['ollama', 'run', 'hf.co/bartowski/Llama-3.2-3B-Instruct-GGUF:IQ3_M', prompt],
+            # ['ollama', 'run', 'mistral', prompt],
+            # ['ollama', 'run', 'mistral:7b-instruct-q4_0', prompt],
+            # ['ollama', 'run', 'llama3.2:1b', prompt],
+            ['ollama', 'run', 'phi3:mini', prompt],
+
+            capture_output=True,
+            text=True,
+            check=True,
+            encoding="utf-8"
+        )
         
-        Args:
-            a: First number
-            b: Second number
-            
-        Returns:
-            Difference of a and b
-        """
-        self._validate_input(a, b)  # NEW: Input validation
-        result = self._format_result(a - b)
-        self._log_operation(f"{a} - {b} = {result}")
-        return result
-    
-    def multiply(self, a, b):
-        """
-        Multiply two numbers
+        response = result.stdout.strip()
+        score = extract_score(response)
+        return response, score
         
-        Args:
-            a: First number
-            b: Second number
-            
-        Returns:
-            Product of a and b
-        """
-        self._validate_input(a, b)  # NEW: Input validation
-        result = self._format_result(a * b)
-        self._log_operation(f"{a} * {b} = {result}")
-        return result
+    except subprocess.TimeoutExpired:
+        return "Analysis timed out", 50
+    except FileNotFoundError:
+        return "Ollama not found", 0
+    except Exception as e:
+        return f"Error: {e}", 50
+
+def extract_score(response):
+    """Extract score from AI response"""
+    # Primary pattern: Look for "Total Score:** X/100" or similar
+    patterns = [
+        r'(?:total\s+score|final\s+score|score)[:*\s]*(\d+)/100',  # "Total Score:** 75/100"
+        r'(\d+)/100',  # Simple "75/100" format
+        r'SCORE:\s*(\d+)',  # "SCORE: 75"
+        r'score\s*[:=]\s*(\d+)',  # "score: 75" or "score = 75"
+        r'(\d+)\s+out\s+of\s+100',  # "75 out of 100"
+    ]
     
-    def divide(self, a, b):
-       """
-        Divide a by b
-        
-        Args:
-            a: Dividend
-            b: Divisor
-            
-        Returns:
-            Quotient of a and b
-            
-        Raises:
-            ValueError: If b is zero
-            TypeError: If arguments are not numbers
-        """
-        self._validate_input(a, b)  # NEW: Input validation
-        if b == 0:
-            raise ValueError("Cannot divide by zero")
-            print("Error")  # Should raise, not print
-        result = self._format_result(a / b)
-        self._log_operation(f"{a} / {b} = {result}")
-        return result
+    for pattern in patterns:
+        match = re.search(pattern, response, re.IGNORECASE)
+        if match:
+            score = int(match.group(1))
+            if 0 <= score <= 100:
+                return score
     
-    def power(self, base, exponent):
-        """NEW: Raise base to the power of exponent"""
-        self._validate_input(base, exponent)
-        result = self._format_result(base ** exponent)
-        self._log_operation(f"{base} ^ {exponent} = {result}")
-        return result
-    
-    def square_root(self, number):
-        """NEW: Calculate square root of a number"""
-        self._validate_input(number)
-        if number < 0:
-            raise ValueError("Cannot calculate square root of negative number")
-        result = self._format_result(math.sqrt(number))
-        self._log_operation(f"√{number} = {result}")
-        return result
-    
-    def percentage(self, value, percentage):
-        """NEW: Calculate percentage of a value"""
-        self._validate_input(value, percentage)
-        result = self._format_result((value * percentage) / 100)
-        self._log_operation(f"{percentage}% of {value} = {result}")
-        return result
-    
-    def get_history(self):
-        """Return calculation history"""
-        return self.history
-    
-    def clear_history(self):
-        """Clear calculation history"""
-        self.history = []
-    
-    def set_precision(self, precision):
-        """NEW: Set decimal precision for results"""
-        if not isinstance(precision, int) or precision < 0:
-            raise ValueError("Precision must be a non-negative integer")
-        self.precision = precision
+    return 75  # Default score
 
 def main():
-    """Enhanced demo function to test the calculator"""
-    calc = Calculator(precision=2)  # CHANGED: Set precision to 2 decimal places
+    """Main function"""
+    print("Checking for code differences...")
     
-    print("Enhanced Calculator Demo")
-    print("=" * 30)
+    # Get differences
+    diff_content = get_code_diff()
     
-    # Original calculations
-    print(f"5 + 3 = {calc.add(5, 3)}")
-    print(f"10 - 4 = {calc.subtract(10, 4)}")
-    print(f"6 * 7 = {calc.multiply(6, 7)}")
-    print(f"15 / 3 = {calc.divide(15, 3)}")
+    if not diff_content:
+        print("No differences found")
+        return
     
-    # NEW: Advanced calculations
-    print(f"2 ^ 8 = {calc.power(2, 8)}")
-    print(f"√16 = {calc.square_root(16)}")
-    print(f"15% of 200 = {calc.percentage(200, 15)}")
+    print(f"Found {len(diff_content.splitlines())} lines of changes")
     
-    print("\nCalculation History:")
-    for entry in calc.get_history():
-        print(f"  {entry}")
+    # Evaluate with Ollama
+    review_result, score = evaluate_with_ollama(diff_content)
     
-    # NEW: Test error handling
-    print("\nTesting error handling:")
-    try:
-        calc.divide(10, 0)
-    except ValueError as e:
-        logger.error(f"Division error: {e}")
-        print(f"  Error caught: {e}")
+    # Display results
+    print("\nReview Results:")
+    print("=" * 50)
+    print(review_result)
+    print("=" * 50)
+    print(f"Score: {score}/100")
     
-    try:
-        calc.square_root(-4)
-    except ValueError as e:
-        logger.error(f"Square roor error: {e}")
-        print(f"  Error caught: {e}")
+    # Store results in variables for further use
+    return {
+        'diff': diff_content,
+        'review': review_result,
+        'score': score
+    }
 
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    results = main()
