@@ -59,12 +59,12 @@ End your response with "SCORE: X/100" where X is the numerical score.
 #Lastly if the score is less than expected theshold that is 75, provide improvements in the code that should be done according to the metrics provided above so that score passes the excpected threshold
   
     try:
-        print("Analyzing with Llama3.2:1b model...")
+        print("Analyzing with Mistral 7b Quantized model...")
         result = subprocess.run(
             # ['ollama', 'run', 'hf.co/bartowski/Llama-3.2-3B-Instruct-GGUF:IQ3_M', prompt],
             # ['ollama', 'run', 'mistral', prompt],
-            # ['ollama', 'run', 'mistral:7b-instruct-q4_0', prompt],
-            ['ollama', 'run', 'llama3.2:1b', prompt],
+            ['ollama', 'run', 'mistral:7b-instruct-q4_0', prompt],
+            # ['ollama', 'run', 'llama3.2:1b', prompt],
             # ['ollama', 'run', 'phi3:mini', prompt],
 
             capture_output=True,
