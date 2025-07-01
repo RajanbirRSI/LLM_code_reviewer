@@ -198,12 +198,27 @@ jobs:
             ---
             *Minimum score required: 75/100*`;
             
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
+            # github.rest.issues.createComment({
+            #   issue_number: context.issue.number,
+            #   owner: context.repo.owner,
+            #   repo: context.repo.repo,
+            #   body: comment
+            # });
+            try {
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            } catch (error) {
+              core.setFailed(`Failed to create PR comment: ${error.message}`);
+              console.log('Complete error object:', error);
+              if (error.response) {
+                console.log('GitHub API response:', error.response);
+              }
+              throw error; // To ensure the job fails if this is critical
+            }
 
   auto-merge:
     needs: code-review
