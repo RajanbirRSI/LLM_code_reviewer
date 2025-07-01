@@ -59,9 +59,9 @@ End your response with "SCORE: X/100" where X is the numerical score.
 #Lastly if the score is less than expected theshold that is 75, provide improvements in the code that should be done according to the metrics provided above so that score passes the excpected threshold
   
     try:
-        print("Analyzing with qwen2.5-coder:1.5b model")
+        print("Analyzing with qwen2.5-coder model")
         result = subprocess.run(
-            ['ollama', 'run', 'qwen2.5-coder:1.5b', prompt],
+            ['ollama', 'run', 'qwen2.5-coder', prompt],
             # ['ollama', 'run', 'mistral', prompt],
             # ['ollama', 'run', 'mistral:7b-instruct-q4_0', prompt],
             # ['ollama', 'run', 'llama3.2:1b', prompt],
