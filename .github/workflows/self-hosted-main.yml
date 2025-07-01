@@ -168,6 +168,10 @@ jobs:
             echo "  - Review Passed: $([ "$PASSED" = "true" ] && echo '✅' || echo '❌')"
           fi
           
+      - name: Test connectivity to api.github.com
+        run: |
+          curl -I https://api.github.com
+          
       - name: Comment on PR
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
