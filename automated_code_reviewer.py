@@ -35,33 +35,40 @@ def evaluate_with_ollama(diff_content):
     if not diff_content:
         return "No changes found", 85
     
-    prompt = f"""You are an expert code reviewer. Analyze the provided code changes and assign a score from 0-100 based on the weighted criteria below.
-        Consider: 
-        1. Code quality (30 points)
-            for eg-Ensure code is DRY (Don't Repeat Yourself)
-        2. Security (30 points)
-            for eg- Check for any security red flags
-            -Watch out for code that could lead to GDPR violations
-        3. Code comments/documentation (10 points)
-            for eg- Make sure all code has docstrings and use style
-        4. Maintainability (10 points)
-            for eg- code is modular and handles exception properly with logging
-        5. Functionality (20 points)
-            for eg- code works as intended and handles edge cases
+    prompt = f"""
+        Code Review Task: Analyze and score this code 0-100.
+        SCORING RUBRIC:
         
-Code changes:
-```diff
-{diff_content}
-```\
-
-End your response with "SCORE: X/100" where X is the numerical score.
-"""
+        Code Quality (30 points): Is it clean, readable, and efficient?
+        Security (30 points): Any vulnerabilities or data risks?
+        Documentation (10 points): Are complex parts explained?
+        Maintainability (10 points): Easy to modify and debug?
+        Functionality (20 points): Does it work and handle errors?
+        
+        FOCUS ON:
+        
+        Most critical issues first
+        Security vulnerabilities
+        Code that could break in production
+        
+        CODE CHANGES:
+        ```diff
+        {diff_content}
+        ```\
+        
+        RESPONSE FORMAT:
+        Critical Issues: [max 3]
+        Minor Issues: [max 2]
+        Good Practices: [1-2 examples]
+        Score: X/100
+        Reason: [brief justification]
+        """
 #Lastly if the score is less than expected theshold that is 75, provide improvements in the code that should be done according to the metrics provided above so that score passes the excpected threshold
   
     try:
-        print("Analyzing with qwen2.5-coder model")
+        print("Analyzing with qwen2.5-coder:3b model")
         result = subprocess.run(
-            ['ollama', 'run', 'qwen2.5-coder', prompt],
+            ['ollama', 'run', 'qwen2.5-coder:3b', prompt],
             # ['ollama', 'run', 'mistral', prompt],
             # ['ollama', 'run', 'mistral:7b-instruct-q4_0', prompt],
             # ['ollama', 'run', 'llama3.2:1b', prompt],
