@@ -36,23 +36,32 @@ def evaluate_with_ollama(diff_content):
         return "No changes found", 85
     
     prompt = f"""
-        You are a code reviewer. Rate this code 0-100.
-        CRITERIA:
-        Code Quality (30pts) - Clean, readable, no duplication
-        Security (30pts) - No SQL injection, XSS, data leaks
-        Documentation (10pts) - Key functions have comments
-        Maintainability (10pts) - Modular, error handling
-        Functionality (20pts) - Works as intended
+        Code Review Task: Analyze and score this code 0-100.
+        SCORING RUBRIC:
+        
+        Code Quality (30 points): Is it clean, readable, and efficient?
+        Security (30 points): Any vulnerabilities or data risks?
+        Documentation (10 points): Are complex parts explained?
+        Maintainability (10 points): Easy to modify and debug?
+        Functionality (20 points): Does it work and handle errors?
+        
+        FOCUS ON:
+        
+        Most critical issues first
+        Security vulnerabilities
+        Code that could break in production
         
         CODE CHANGES:
         ```diff
         {diff_content}
         ```\
         
-        FORMAT:
-        Issues: [list top 3 problems]
-        Strengths: [list 2 good things]
-        SCORE: X/100
+        RESPONSE FORMAT:
+        Critical Issues: [max 3]
+        Minor Issues: [max 2]
+        Good Practices: [1-2 examples]
+        Score: X/100
+        Reason: [brief justification]
         """
 #Lastly if the score is less than expected theshold that is 75, provide improvements in the code that should be done according to the metrics provided above so that score passes the excpected threshold
   
