@@ -14,7 +14,7 @@ permissions:
 
 jobs:
   code-review:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     
     # Set default shell to bash for all steps
     defaults:
