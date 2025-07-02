@@ -1,9 +1,4 @@
 # calculator.py - Enhanced Calculator Demo
-# Updated version with advanced operations and input validation
-# CHANGES: Added power, square root, and percentage operations
-# CHANGES: Enhanced error handling and input validation
-# CHANGES: Added configuration for decimal precision
-# CHANGES: Modified history format to include timestamps
 
 import math
 import datetime
