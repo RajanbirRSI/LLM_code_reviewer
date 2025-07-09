@@ -60,7 +60,7 @@ def evaluate_with_ollama(diff_content):
         Critical Issues: [max 3]
         Minor Issues: [max 2]
         Good Practices: [1-2 examples]
-        Score: X/100
+        Score: X/100 [Aggregate of scores in scoring rubric where X = Code Quality Score + Security Score + Documentation Score + Maintainability Score + Functionality Score]
         Reason: [brief justification]
         """
 #Lastly if the score is less than expected theshold that is 75, provide improvements in the code that should be done according to the metrics provided above so that score passes the excpected threshold
