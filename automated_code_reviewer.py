@@ -37,31 +37,32 @@ def evaluate_with_ollama(diff_content):
     
     prompt = f"""
         Code Review Task: Analyze and score this code 0-100.
-        SCORING RUBRIC:
         
+        SCORING RUBRIC:
         Code Quality (30 points): Is it clean, readable, and efficient?
         Security (30 points): Any vulnerabilities or data risks?
         Documentation (10 points): Are complex parts explained?
         Maintainability (10 points): Easy to modify and debug?
         Functionality (20 points): Does it work and handle errors?
-        
-        FOCUS ON:
-        
-        Most critical issues first
-        Security vulnerabilities
-        Code that could break in production
-        
+
         CODE CHANGES:
         ```diff
         {diff_content}
         ```\
         
-        RESPONSE FORMAT:
+        CHECK FOR:        
+        Security bugs (SQL injection, XSS, hardcoded secrets)
+        Code that might crash in production
+        Missing error handling
+        Poor performance patterns
+        
+        REQUIRED OUTPUT:
         Critical Issues: [max 3]
         Minor Issues: [max 2]
         Good Practices: [1-2 examples]
-        Score: X/100 [Aggregate of scores in scoring rubric where X = Code Quality Score + Security Score + Documentation Score + Maintainability Score + Functionality Score]
-        Reason: [brief justification]
+        Individual Scores: Quality=X/30, Security=X/30, Documentation=X/10, Maintainability=X/10, Functionality=X/20
+        Score: X/100 [Aggregate of all individual scores]
+        Reason: [1-2 sentences explaining the total score]
         """
 #Lastly if the score is less than expected theshold that is 75, provide improvements in the code that should be done according to the metrics provided above so that score passes the excpected threshold
   
