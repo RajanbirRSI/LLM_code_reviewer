@@ -955,9 +955,8 @@ class APIHandler:
     
     def handle_get_users(self, request_data: Dict) -> Dict:
         """Handle get all users request"""
-        # No authentication check
-        # No authorization check
-        # No pagination
+        # Add autorization and authentication check
+        # if needed add pagination
         
         users = self.user_manager.get_all_users()
         
@@ -982,9 +981,7 @@ class APIHandler:
         total_amount = request_data.get("total_amount")
         items = request_data.get("items", [])
         
-        # No authentication
-        # No authorization
-        # No input validation
+        # Add authorization, authetication and input validation
         
         result = self.order_manager.create_order(user_id, total_amount, items)
         return result
