@@ -62,19 +62,18 @@ def evaluate_with_ollama(diff_content):
         Individual Scores: Quality=X/30, Security=X/30, Documentation=X/10, Maintainability=X/10, Functionality=X/20
         Score: X/100 [Aggregate of all individual scores]
         Reason: [1-2 sentences explaining the total score]
-
         """
 #Lastly if the score is less than expected theshold that is 75, provide improvements in the code that should be done according to the metrics provided above so that score passes the excpected threshold
   
     try:
         print("Analyzing with qwen2.5-coder:3b model")
         result = subprocess.run(
-            ['ollama', 'run', 'qwen2.5-coder:3b', prompt],
+            ['ollama', 'run', 'qwen2.5-coder:3b'],
             # ['ollama', 'run', 'mistral', prompt],
             # ['ollama', 'run', 'mistral:7b-instruct-q4_0', prompt],
             # ['ollama', 'run', 'llama3.2:1b', prompt],
             # ['ollama', 'run', 'phi3:mini', prompt],
-
+            input=prompt,
             capture_output=True,
             text=True,
             check=True,
