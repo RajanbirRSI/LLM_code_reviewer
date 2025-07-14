@@ -174,6 +174,7 @@ IMPORTANT:
 - Provide concrete suggestions for improvement
 - If total score < 70, provide detailed improvement plan
 """  
+
     try:
         print("Analyzing with qwen2.5-coder:3b model")
         start_time = time.time()
