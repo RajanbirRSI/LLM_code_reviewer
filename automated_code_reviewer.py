@@ -197,8 +197,8 @@ IMPORTANT:
         
     except subprocess.TimeoutExpired:
         return "Analysis timed out", 50
-    # except FileNotFoundError:
-    #     return "Ollama not found", 0
+    except FileNotFoundError:
+        return "Ollama not found", 0
     except Exception as e:
         return f"Error: {e}", 50
 
