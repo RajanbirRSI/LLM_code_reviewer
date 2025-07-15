@@ -9,7 +9,8 @@ on:
   #   types: [opened, synchronize, reopened]
   # Add comment-based trigger
   issue_comment:
-    types: [created]
+    types:
+      - created
 
 permissions:
   contents: write
