@@ -23,7 +23,7 @@ jobs:
     runs-on: self-hosted
 
     # Only run on PR comments with '/review' command OR on push/PR events
-    if: ${{github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '/review')}} 
+    if: ${{github.event_name=='issue_comment' && github.event.issue.pull_request && github.event.comment.body=='/review'}} 
     
     # Set default shell to bash for all steps
     defaults:
