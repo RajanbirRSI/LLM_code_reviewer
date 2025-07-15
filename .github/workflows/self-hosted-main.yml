@@ -5,8 +5,10 @@ on:
   push:
     branches-ignore:
       - main
-  # pull_request:
-  #   types: [opened, synchronize, reopened]
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches:
+      - main
   # Add comment-based trigger
   issue_comment:
     types:
@@ -22,10 +24,9 @@ jobs:
 
     # Only run on PR comments with '/review' command OR on push/PR events
     if: |
-      (github.event_name == 'issue_comment' && 
+       github.event_name == 'issue_comment' && 
        github.event.issue.pull_request && 
-       github.event.comment.body == '/review') ||
-      (github.event_name != 'issue_comment')
+       contains(github.event.comment.body, '/review')) 
     
     # Set default shell to bash for all steps
     defaults:
