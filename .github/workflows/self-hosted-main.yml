@@ -5,8 +5,11 @@ on:
   push:
     branches-ignore:
       - main
-  pull_request:
-    types: [opened, synchronize, reopened]
+  # pull_request:
+  #   types: [opened, synchronize, reopened]
+  # Add comment-based trigger
+  issue_comment:
+    types: [created]
 
 permissions:
   contents: write
@@ -15,6 +18,13 @@ permissions:
 jobs:
   code-review:
     runs-on: self-hosted
+
+    # Only run on PR comments with '/review' command OR on push/PR events
+    if: |
+      (github.event_name == 'issue_comment' && 
+       github.event.issue.pull_request && 
+       github.event.comment.body == '/review') ||
+      (github.event_name != 'issue_comment')
     
     # Set default shell to bash for all steps
     defaults:
@@ -28,6 +38,44 @@ jobs:
       should-merge: ${{ steps.check-merge.outputs.should-merge }}
       
     steps:
+      - name: React to comment with eyes emoji
+        if: github.event_name == 'issue_comment'
+        run: |
+          gh api graphql --silent --raw-field query="mutation AddReaction {addReaction(input:{subjectId: \"$NODE_ID\", content: EYES}){reaction{content} subject{id}}}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_ID: ${{ github.event.comment.node_id }}
+
+      - name: Check if PR is open
+        if: github.event_name == 'issue_comment'
+        run: |
+          STATE=$(gh pr view $PR_NUMBER --repo ${{ github.repository }} --json state --jq '.state')
+          if [ "$STATE" != "OPEN" ]; then
+            echo "Cannot build for closed PRs"
+            (
+              echo "**${{ github.workflow }}**"
+              echo "Cannot run code review for a closed PR. Please reopen the PR to run the review."
+            ) | \
+            gh pr comment "${PR_NUMBER}" --repo ${{ github.repository }} -F -
+            gh api graphql --silent --raw-field query="mutation AddReaction {addReaction(input:{subjectId: \"$NODE_ID\", content: THUMBS_DOWN}){reaction{content} subject{id}}}"
+            gh api graphql --silent --raw-field query="mutation RemoveReaction {removeReaction(input:{subjectId: \"$NODE_ID\", content: EYES}){reaction{content} subject{id}}}"
+            exit 1
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          NODE_ID: ${{ github.event.comment.node_id }}
+
+      - name: Get PR HEAD Ref
+        if: github.event_name == 'issue_comment'
+        id: getRef
+        run: |
+          PR_REF=$(gh pr view $PR_NUMBER --repo ${{ github.repository }} --json headRefName --jq '.headRefName')
+          echo "pr_ref=$PR_REF" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.issue.number }}
+          
       - name: Checkout code
         uses: actions/checkout@v4
         with:
