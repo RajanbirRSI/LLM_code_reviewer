@@ -172,8 +172,8 @@ IMPORTANT:
 - Prioritize security and functionality issues
 - Consider the impact on the overall system
 - Provide concrete suggestions for improvement
-- If total score < 70, provide detailed improvement plan
 """  
+# - If total score < 70, provide detailed improvement plan
 
     try:
         print("Analyzing with qwen2.5-coder:3b model")
