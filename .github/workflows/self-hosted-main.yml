@@ -7,6 +7,10 @@ on:
       - main
   pull_request:
     types: [opened, synchronize, reopened]
+  # Add comment-based trigger
+  # issue_comment:
+  #   types:
+  #     - created
 
 permissions:
   contents: write
@@ -236,7 +240,8 @@ jobs:
               pull_number: context.issue.number,
               commit_title: `Auto-merge: Code review passed (${score}/100)`,
               commit_message: `Automated merge after successful code review.\nScore: ${score}/100\nThreshold: 75/100`,
-              merge_method: 'squash'
+              // merge_method: 'squash'
+              merge_method: 'merge'
             });
             
             console.log('✅ PR merged successfully!');
