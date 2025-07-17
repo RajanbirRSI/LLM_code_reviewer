@@ -1,12 +1,12 @@
 name: Automated Code Review (Bash Version)
 
 on:
-  issue_comment:
-    types: [created, edited]
-  # workflow_dispatch:
-  # push:
-  #   branches-ignore:
-  #     - main
+  # issue_comment:
+  #   types: [created, edited]
+  workflow_dispatch:
+  push:
+    branches-ignore:
+      - main
   # pull_request:
   #   types: [opened, synchronize, reopened]
   # Add comment-based trigger
@@ -18,7 +18,7 @@ permissions:
 jobs:
   code-review:
     runs-on: self-hosted
-    if: github.event.issue.pull_request && contains(github.event.comment.body, '/review')   # check the comment if it contains the keywords
+    # if: github.event.issue.pull_request && contains(github.event.comment.body, '/review')   # check the comment if it contains the keywords
     
     # Set default shell to bash for all steps
     defaults:
@@ -184,8 +184,8 @@ jobs:
           script: |
             const score = ${{ steps.code-review.outputs.score }};
             const passed = ${{ steps.code-review.outputs.passed }};
-            // const shouldMerge = ${{ steps.check-merge.outputs.should-merge }};
-            const shouldMerge = 'true';
+            const shouldMerge = ${{ steps.check-merge.outputs.should-merge }};
+            // const shouldMerge = 'true';
             const status = passed ? '✅ PASSED' : '❌ FAILED';
             const mergeStatus = shouldMerge ? '🔄 Auto-merge enabled' : '⏸️ Manual review required';
             
