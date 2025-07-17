@@ -1,6 +1,8 @@
 name: Automated Code Review (Bash Version)
 
 on:
+  issue_comment:
+    types: [created, edited]
   # workflow_dispatch:
   # push:
   #   branches-ignore:
@@ -8,8 +10,6 @@ on:
   # pull_request:
   #   types: [opened, synchronize, reopened]
   # Add comment-based trigger
-  issue_comment:
-    types: [created, edited, deleted]
 
 permissions:
   contents: write
@@ -17,8 +17,8 @@ permissions:
 
 jobs:
   code-review:
-    if: contains(github.event.comment.body, '/review')   # check the comment if it contains the keywords
     runs-on: self-hosted
+    if: github.event.issue.pull_request && contains(github.event.comment.body, '/deploy')   # check the comment if it contains the keywords
     
     # Set default shell to bash for all steps
     defaults:
