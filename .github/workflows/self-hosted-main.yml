@@ -1,12 +1,12 @@
 name: Automated Code Review (Bash Version)
 
 on:
-  # issue_comment:
-  #   types: [created, edited]
-  workflow_dispatch:
-  push:
-    branches-ignore:
-      - main
+  issue_comment:
+    types: [created, edited]
+  # workflow_dispatch:
+  # push:
+  #   branches-ignore:
+  #     - main
   # pull_request:
   #   types: [opened, synchronize, reopened]
   # Add comment-based trigger
