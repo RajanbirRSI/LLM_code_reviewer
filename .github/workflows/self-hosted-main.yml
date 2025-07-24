@@ -3,13 +3,6 @@ name: Automated Code Review (Bash Version)
 on:
   issue_comment:
     types: [created, edited]
-  # workflow_dispatch:
-  # push:
-  #   branches-ignore:
-  #     - main
-  # pull_request:
-  #   types: [opened, synchronize, reopened]
-  # Add comment-based trigger
 
 permissions:
   contents: write
@@ -43,7 +36,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_ID: ${{ github.event.comment.node_id }}
-      
+
       - name: Check powershell is working
         shell: pwsh
         run: |
@@ -190,8 +183,8 @@ jobs:
           script: |
             const score = ${{ steps.code-review.outputs.score }};
             const passed = ${{ steps.code-review.outputs.passed }};
-            // const shouldMerge = ${{ steps.check-merge.outputs.should-merge }};
-            const shouldMerge = 'true';
+            const shouldMerge = ${{ steps.check-merge.outputs.should-merge }};
+            // const shouldMerge = 'true';
             const status = passed ? '✅ PASSED' : '❌ FAILED';
             const mergeStatus = shouldMerge ? '🔄 Auto-merge enabled' : '⏸️ Manual review required';
             
@@ -246,8 +239,8 @@ jobs:
               pull_number: context.issue.number,
               commit_title: `Auto-merge: Code review passed (${score}/100)`,
               commit_message: `Automated merge after successful code review.\nScore: ${score}/100\nThreshold: 75/100`,
-              merge_method: 'squash'
-              // merge_method: 'merge'
+              // merge_method: 'squash'
+              merge_method: 'merge'
             });
             
             console.log('✅ PR merged successfully!');
@@ -280,13 +273,3 @@ jobs:
         echo "Score: ${{ needs.code-review.outputs.review-score }}/100"
         echo "Minimum required: 75/100"
         echo "Manual review and fixes required before merge"
-
-      # - name: Upload review artifacts
-      #   if: always()
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: code-review-results
-      #     path: |
-      #       review_output.txt
-      #       *.log
-      #     retention-days: 30
