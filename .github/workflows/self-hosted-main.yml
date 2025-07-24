@@ -3,13 +3,6 @@ name: Automated Code Review (Bash Version)
 on:
   issue_comment:
     types: [created, edited]
-  # workflow_dispatch:
-  # push:
-  #   branches-ignore:
-  #     - main
-  # pull_request:
-  #   types: [opened, synchronize, reopened]
-  # Add comment-based trigger
 
 permissions:
   contents: write
@@ -18,7 +11,7 @@ permissions:
 jobs:
   code-review:
     runs-on: self-hosted
-    # if: github.event.issue.pull_request && contains(github.event.comment.body, '/review')   # check the comment if it contains the keywords
+    if: github.event.issue.pull_request && contains(github.event.comment.body, '/review')   # check the comment if it contains the keywords
     
     # Set default shell to bash for all steps
     defaults:
@@ -246,8 +239,8 @@ jobs:
               pull_number: context.issue.number,
               commit_title: `Auto-merge: Code review passed (${score}/100)`,
               commit_message: `Automated merge after successful code review.\nScore: ${score}/100\nThreshold: 75/100`,
-              merge_method: 'squash'
-              // merge_method: 'merge'
+              // merge_method: 'squash'
+              merge_method: 'merge'
             });
             
             console.log('✅ PR merged successfully!');
@@ -280,13 +273,3 @@ jobs:
         echo "Score: ${{ needs.code-review.outputs.review-score }}/100"
         echo "Minimum required: 75/100"
         echo "Manual review and fixes required before merge"
-
-      # - name: Upload review artifacts
-      #   if: always()
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: code-review-results
-      #     path: |
-      #       review_output.txt
-      #       *.log
-      #     retention-days: 30
