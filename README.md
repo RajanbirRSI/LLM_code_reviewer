@@ -74,21 +74,7 @@ The workflow activates automatically on:
 - 🔧 **GitHub Actions Workflow**
 - 🐍 **Python** backend logic
 - 🛠️ **Git CLI** for diffing and branch handling
+-  X **Self Hosted Server** for hosting ollama and running LLM models on ollama
 
 ---
 
-## 📂 Project Structure
-
-
-LLM_code_reviewer/
-├── .github/workflows/
-│ └── code_review.yml # GitHub Actions workflow
-├── agents/
-│ └── code_reviewer_agent.py # Core agent logic
-├── llm_interface/
-│ └── ollama_wrapper.py # LLM interaction layer
-├── scoring/
-│ └── scorer.py # Review dimensions + scoring
-├── utils/
-│ └── git_utils.py # Git diff + branch utility functions
-└── main.py # Entrypoint for local testing
