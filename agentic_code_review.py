@@ -648,27 +648,6 @@ IMPORTANT:
 # Usage example and configuration
 def main():
     """Demonstrate the LangGraph code review system"""
-    
-#     # Sample code diff with obvious issues
-#     sample_diff = """
-# + def process_user_input(user_input):
-# +     # Process user input without validation - SQL injection risk!
-# +     query = "SELECT * FROM users WHERE id = " + user_input
-# +     result = execute_query(query)
-# +     return result
-# +
-# + def calculate_total(items):
-# +     total = 0
-# +     for item in items:
-# +         total += item.price  # No null check
-# +     return total
-# +
-# + def authenticate_user(username, password):
-# +     # Weak authentication
-# +     if username == "admin" and password == "123456":
-# +         return True
-# +     return False
-# """
     code_diff = GitOperations.get_code_diff("autotest-review")
     print(code_diff)
     # Configure Ollama (adjust model and settings as needed)
@@ -719,12 +698,7 @@ def main():
         
             print("\n" + "="*60)
         
-            # Export full results to JSON file
-            # with open("code_review_results.json", "w") as f:
-            #     json.dump(review_result, f, indent=2)
-            # print("📄 Full results exported to 'code_review_results.json'")
             print(review_result)
-            # return review_result
         
     except Exception as e:
         print(f"❌ Failed to initialize or run code review: {e}")
