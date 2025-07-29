@@ -92,7 +92,8 @@ jobs:
           
           # Run the Python script with explicit error handling
           set +e  # Don't exit on error immediately
-          python automated_code_reviewer.py > review_output.txt 2>&1
+          python agentic_code_review.py > review_output.txt 2>&1
+          # python automated_code_reviewer.py > review_output.txt 2>&1
           python_exit_code=$?
           set -e  # Re-enable exit on error
           
