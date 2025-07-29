@@ -7,6 +7,8 @@ import asyncio
 import aiohttp
 from enum import Enum
 import re
+import os
+import sys
 
 # LangGraph imports
 from langgraph.graph import StateGraph, END
@@ -22,6 +24,10 @@ except ImportError:
 
 from langchain_core.output_parsers import JsonOutputParser
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
+
+os.environ["PYTHONIOENCODING"] = "utf-8"
+sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding='utf-8', line_buffering=True)
+sys.stderr = io.TextIOWrapper(sys.stderr.detach(), encoding='utf-8', line_buffering=True)
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
