@@ -668,39 +668,39 @@ def main():
     
     try:
         # Initialize the reviewer
-        print("🚀 Initializing LangGraph Code Reviewer with Ollama...")
+        print("Initializing LangGraph Code Reviewer with Ollama...")
         reviewer = LangGraphCodeReviewer(ollama_config)
         
         # Execute the review
-        print("⏳ Executing code review workflow...")
+        print("Executing code review workflow...")
         # review_result = reviewer.review_code(sample_diff)
         review_result = reviewer.review_code(code_diff)
         
         # Display results
         print("\n" + "="*60)
-        print("🎯 LANGGRAPH CODE REVIEW RESULTS")
+        print("LANGGRAPH CODE REVIEW RESULTS")
         print("="*60)
         
         if "error" in review_result:
-            print(f"❌ Error: {review_result['error']}")
+            print(f"Error: {review_result['error']}")
         else:
             # Pretty print results
             overall = review_result.get("overall_assessment", {})
-            print(f"📊 Total Score: {overall.get('total_score', 'N/A')}/100")
-            print(f"🚨 Risk Level: {overall.get('risk_level', 'N/A')}")
-            print(f"✅ Recommendation: {overall.get('recommendation', 'N/A')}")
+            print(f"Total Score: {overall.get('total_score', 'N/A')}/100")
+            print(f"Risk Level: {overall.get('risk_level', 'N/A')}")
+            print(f"Recommendation: {overall.get('recommendation', 'N/A')}")
             
-            print(f"\n🔍 Dimension Scores:")
+            print(f"\n Dimension Scores:")
             dimensions = review_result.get("dimension_scores", {})
             for dim, result in dimensions.items():
                 if result:
                     print(f"  {dim.title()}: {result.get('score', 'N/A')} (conf: {result.get('confidence', 0):.2f})")
             
-            print(f"\n⚠️ Critical Issues ({len(overall.get('critical_issues', []))}):")
+            print(f"\nCritical Issues ({len(overall.get('critical_issues', []))}):")
             for issue in overall.get('critical_issues', [])[:5]:
                 print(f"  • {issue}")
             
-            print(f"\n📝 Summary:")
+            print(f"\nSummary:")
             print(f"  {overall.get('review_summary', 'No summary available')}")
         
             print("\n" + "="*60)
@@ -708,8 +708,8 @@ def main():
             print(review_result)
         
     except Exception as e:
-        print(f"❌ Failed to initialize or run code review: {e}")
-        print("\n🔧 Troubleshooting:")
+        print(f"Failed to initialize or run code review: {e}")
+        print("\nTroubleshooting:")
         print("1. Ensure Ollama is running: `ollama serve`")
         print("2. Pull the model: `ollama pull qwen2.5-coder:3b`")
         print("3. Check if the model name is correct")
