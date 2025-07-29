@@ -656,7 +656,7 @@ IMPORTANT:
 def main():
     """Demonstrate the LangGraph code review system"""
     code_diff = GitOperations.get_code_diff("autotest-review")
-    print(code_diff)
+    # print(code_diff)
     # Configure Ollama (adjust model and settings as needed)
     ollama_config = OllamaConfig(
         model="qwen2.5-coder:3b",  # Fast, code-focused model
