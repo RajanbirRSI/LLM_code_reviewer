@@ -1,10 +1,11 @@
-name: Automated Code Review (Bash Version)
+name: Code Review for newly pushed changes
 
 on:
-  issue_comment:
-    types: [created, edited]
-  
-      
+  workflow_dispatch:
+  push:
+    branches-ignore:
+      - main
+
 permissions:
   contents: write
   pull-requests: write
@@ -12,9 +13,6 @@ permissions:
 jobs:
   code-review:
     runs-on: self-hosted
-    if: |
-      (github.event_name == 'pull_request') || 
-      (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '/review')) 
         
     # Set default shell to bash for all steps
     defaults:
@@ -33,23 +31,6 @@ jobs:
         with:
           fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Put a reaction to the comment
-        run: gh api graphql --silent --raw-field query="mutation AddReaction {addReaction(input:{subjectId:\"$NODE_ID\",content:EYES}){reaction{content}subject{id}}}"
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_ID: ${{ github.event.comment.node_id }}
-
-      - name: Check powershell is working
-        shell: pwsh
-        run: |
-         pwsh -Command "Write-Host 'PowerShell Core is working!'"
-         
-      - name: Check Python
-        shell: pwsh  # Use Bash
-        run: |
-          python --version
-          pip --version
 
       - name: Install dependencies
         shell: pwsh
@@ -182,103 +163,4 @@ jobs:
             echo "  - Is Pull Request: $([ "$IS_PR" = "true" ] && echo '✅' || echo '❌')"
             echo "  - Review Passed: $([ "$PASSED" = "true" ] && echo '✅' || echo '❌')"
           fi
-                   
-      - name: Comment on PR
-        if: |
-          (github.event_name == 'pull_request') || 
-          (github.event_name == 'issue_comment' && github.event.issue.pull_request != null)
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const score = ${{ steps.code-review.outputs.score }};
-            const passed = ${{ steps.code-review.outputs.passed }};
-            const shouldMerge = ${{ steps.check-merge.outputs.should-merge }};
-            // const shouldMerge = 'true';
-            const status = passed ? '✅ PASSED' : '❌ FAILED';
-            const mergeStatus = shouldMerge ? '🔄 Auto-merge enabled' : '⏸️ Manual review required';
-            
-            const comment = `## 🤖 Automated Code Review Results
-            
-            **Score:** ${score}/100
-            **Status:** ${status}
-            **Action:** ${mergeStatus}
-            
-            ${passed ? 
-              '✅ Your code meets our quality standards!' : 
-              '❌ Please address the issues and push changes for re-review.'
-            }
-            
-            ---
-            *Minimum score required: 75/100*`;
-            
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
 
-  auto-merge:
-    needs: code-review
-    runs-on: self-hosted
-    if: needs.code-review.outputs.should-merge == 'true'
-    permissions:
-      contents: write
-      pull-requests: write
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-    
-    - name: Auto-merge PR
-      uses: actions/github-script@v7
-      with:
-        script: |
-          // Fixed output reference
-          const score = ${{ needs.code-review.outputs.score }};
-          
-          console.log(`Attempting to merge PR with score: ${score}/100`);
-          
-          try {
-            await github.rest.pulls.merge({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number,
-              commit_title: `Auto-merge: Code review passed (${score}/100)`,
-              commit_message: `Automated merge after successful code review.\nScore: ${score}/100\nThreshold: 75/100`,
-              merge_method: 'squash'
-              // merge_method: 'merge'
-            });
-            
-            console.log('✅ PR merged successfully!');
-            
-          } catch (error) {
-            console.error('❌ Failed to merge PR:', error.message);
-            
-            await github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `## ⚠️ Auto-merge Failed
-              
-              The code review passed (${score}/100), but automatic merging failed.
-              Please merge manually or check for conflicts.
-              
-              **Error:** ${error.message}`
-            });
-          }
-
-  notify-failure:
-    needs: code-review
-    runs-on: self-hosted
-    if: needs.code-review.outputs.passed == 'false'
-    
-    steps:
-    - name: Notify review failure
-      run: |
-        echo "❌ Code review failed"
-        echo "Score: ${{ needs.code-review.outputs.review-score }}/100"
-        echo "Minimum required: 75/100"
-        echo "Manual review and fixes required before merge"
