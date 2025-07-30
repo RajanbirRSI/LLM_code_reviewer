@@ -16,9 +16,9 @@ permissions:
 jobs:
   code-review:
     runs-on: self-hosted
-    if: |
-      (github.event_name == 'pull_request') || 
-      (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '/review')) 
+    # if: |
+    #   (github.event_name == 'pull_request') || 
+    #   (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '/review')) 
         
     # Set default shell to bash for all steps
     defaults:
