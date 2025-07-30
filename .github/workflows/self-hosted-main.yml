@@ -1,12 +1,13 @@
 name: Automated Code Review (Bash Version)
 
 on:
-  issue_comment:
-    types: [created, edited]
   workflow_dispatch:
   push:
     branches-ignore:
       - main
+  issue_comment:
+    types: [created, edited]
+  
       
 permissions:
   contents: write
@@ -251,8 +252,8 @@ jobs:
               pull_number: context.issue.number,
               commit_title: `Auto-merge: Code review passed (${score}/100)`,
               commit_message: `Automated merge after successful code review.\nScore: ${score}/100\nThreshold: 75/100`,
-              // merge_method: 'squash'
-              merge_method: 'merge'
+              merge_method: 'squash'
+              // merge_method: 'merge'
             });
             
             console.log('✅ PR merged successfully!');
