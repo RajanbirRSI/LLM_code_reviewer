@@ -3,7 +3,10 @@ name: Automated Code Review (Bash Version)
 on:
   issue_comment:
     types: [created, edited]
-
+  push:
+    branches-ignore:
+      - main
+      
 permissions:
   contents: write
   pull-requests: write
