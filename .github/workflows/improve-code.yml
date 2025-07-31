@@ -1,0 +1,187 @@
+name: Automated Code Review (Bash Version)
+
+on:
+  issue_comment:
+    types: [created, edited]
+  
+      
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  code-review:
+    runs-on: self-hosted
+    if: |
+      (github.event_name == 'pull_request') || 
+      (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '/improve')) 
+        
+    # Set default shell to bash for all steps
+    defaults:
+      run:
+        shell: bash
+        
+    # Add job-level outputs that reference step outputs
+    outputs:
+      score: ${{ steps.code-review.outputs.score }}
+      passed: ${{ steps.code-review.outputs.passed }}
+      should-merge: ${{ steps.check-merge.outputs.should-merge }}
+      
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Put a reaction to the comment
+        run: gh api graphql --silent --raw-field query="mutation AddReaction {addReaction(input:{subjectId:\"$NODE_ID\",content:EYES}){reaction{content}subject{id}}}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_ID: ${{ github.event.comment.node_id }}
+
+      - name: Check powershell is working
+        shell: pwsh
+        run: |
+         pwsh -Command "Write-Host 'PowerShell Core is working!'"
+         
+      - name: Check Python
+        shell: pwsh  # Use Bash
+        run: |
+          python --version
+          pip --version
+
+      - name: Install dependencies
+        shell: pwsh
+        run: |
+          if (Test-Path "requirements.txt") {
+            pip install -r requirements.txt
+          }
+          pip install requests PyGithub
+
+      - name: Check Ollama service
+        shell: pwsh
+        run: |
+          try {
+            ollama ps
+            Write-Host "Ollama is running"
+          } catch {
+            Write-Host "Starting Ollama service..."
+            Start-Process "ollama" -ArgumentList "serve" -WindowStyle Hidden
+            Start-Sleep 10
+            ollama ps
+          }
+
+      - name: Ensure required models are available
+        shell: pwsh
+        run: |
+          $models = ollama list
+          # if ($models -notmatch "mistral") {
+          #   Write-Host "Pulling Mistral model..."
+          #   ollama pull mistral
+          # }
+          if ($models -notmatch "hf.co/bartowski/Llama-3.2-3B-Instruct-GGUF:IQ3_M") {
+            Write-Host "Pulling Llama 3.2 quantized model..."
+            ollama pull hf.co/bartowski/Llama-3.2-3B-Instruct-GGUF:IQ3_M 
+          }
+
+      - name: Run automated code reviewer
+        id: code-review
+        shell: bash  # Your original bash syntax works here
+        run: |
+          echo "========================= Running Code Review =============================="
+          
+          # Run the Python script with explicit error handling
+          set +e  # Don't exit on error immediately
+          # python agentic_code_review.py > review_output.txt 2>&1
+          python automated_code_reviewer.py > review_output.txt 2>&1
+          python_exit_code=$?
+          set -e  # Re-enable exit on error
+          
+          echo "Python script exit code: $python_exit_code"
+          
+          # Always show what was captured
+          if [ -f "review_output.txt" ]; then
+            echo "========================= Review Output Content =============================="
+            cat review_output.txt
+            echo "========================= End of Review Output "=========================
+          else
+            echo "Review output file was not created!"
+            exit 1
+          fi
+          
+          # Check if Python script failed
+          if [ $python_exit_code -ne 0 ]; then
+            echo "Python script failed with exit code: $python_exit_code"
+            # Don't exit here, try to extract score anyway
+          fi
+
+          # # Extract score from output
+          # #SCORE=$(grep -o "Score: [0-9]\+/100" review_output.txt | grep -o "[0-9]\+" | tail -1)
+          # #SCORE=$(grep -oE "Score: [0-9]+/100" review_output.txt | grep -oE "[0-9]+" | head -1)
+          # SCORE=$(grep -oE "\b[0-9]+/100\b" review_output.txt | cut -d'/' -f1 | head -1)
+
+          # Extract score from output using only grep -o (no -E)
+          SCORE=$(grep -o "[0-9]\{1,3\}/100" review_output.txt | cut -d'/' -f1 | head -1)
+          
+          # Default score if nothing found
+          if [ -z "$SCORE" ]; then
+            echo " /!\ Could not extract score from output, defaulting to 0"
+            SCORE=0
+          else
+            echo "Extracted Score: $SCORE"
+          fi
+            
+            # Set outputs for next steps
+            echo "score=$SCORE" >> $GITHUB_OUTPUT
+          
+          # Determine pass/fail
+          if [ "$SCORE" -ge 75 ]; then
+            echo "passed=true" >> $GITHUB_OUTPUT
+            echo "Review Passed: YES (Score: $SCORE/100)"
+          else
+            echo "passed=false" >> $GITHUB_OUTPUT
+            echo "Review Failed: NO (Score: $SCORE/100)"
+          fi
+
+      - name: Debug outputs
+        shell: bash
+        run: |
+          echo "=== Debug Outputs ==="
+          echo "Score output: ${{ steps.code-review.outputs.score }}"
+          echo "Passed output: ${{ steps.code-review.outputs.passed }}"
+                   
+      - name: Comment on PR
+        if: |
+          (github.event_name == 'pull_request') || 
+          (github.event_name == 'issue_comment' && github.event.issue.pull_request != null)
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const score = ${{ steps.code-review.outputs.score }};
+            const passed = ${{ steps.code-review.outputs.passed }};
+            const shouldMerge = ${{ steps.check-merge.outputs.should-merge }};
+            // const shouldMerge = 'true';
+            const status = passed ? '✅ PASSED' : '❌ FAILED';
+            const mergeStatus = shouldMerge ? '🔄 Auto-merge enabled' : '⏸️ Manual review required';
+            
+            const comment = `## 🤖 Automated Code Review Results
+            
+            **Score:** ${score}/100
+            **Status:** ${status}
+            **Action:** ${mergeStatus}
+            
+            ${passed ? 
+              '✅ Your code meets our quality standards!' : 
+              '❌ Please address the issues and push changes for re-review.'
+            }
+            
+            ---
+            *Minimum score required: 75/100*`;
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
