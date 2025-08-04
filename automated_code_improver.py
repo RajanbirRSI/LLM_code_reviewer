@@ -258,7 +258,8 @@ def main():
     # Store results in variables for further use
     return {
         'diff': diff_content,
-        'review': formatted_response
+        'review': formatted_response,
+        'issues_count': total_issues
     }
 
 if __name__ == '__main__':
