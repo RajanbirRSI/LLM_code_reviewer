@@ -3,8 +3,9 @@ name: Code Review for newly pushed changes
 on:
   workflow_dispatch:
   push:
-    branches-ignore:
-      - main
+    branches:
+    #Added demo name so workflwo shouldn't trigger
+      - demo
 
 permissions:
   contents: write
