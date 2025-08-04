@@ -16,6 +16,9 @@ permissions:
 jobs:
   code-improve:
     runs-on: self-hosted
+    if: |
+          (github.event_name == 'pull_request') || 
+          (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '/improve')) 
         
     # Set default shell to bash for all steps
     defaults:
@@ -36,9 +39,6 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Put a reaction to the comment
-        if: |
-          (github.event_name == 'pull_request') || 
-          (github.event_name == 'issue_comment' && github.event.issue.pull_request && contains(github.event.comment.body, '/improve')) 
         run: gh api graphql --silent --raw-field query="mutation AddReaction {addReaction(input:{subjectId:\"$NODE_ID\",content:EYES}){reaction{content}subject{id}}}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
