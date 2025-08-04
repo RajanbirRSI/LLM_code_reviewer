@@ -123,6 +123,7 @@ jobs:
         shell: bash
         run: |
           echo "=== Debug Outputs ==="
+          echo "Score output: ${{ steps.code-review.outputs.score }}"
           echo "Passed output: ${{ steps.code-review.outputs.passed }}"
                    
       - name: Comment on PR
