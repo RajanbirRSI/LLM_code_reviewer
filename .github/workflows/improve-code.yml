@@ -1,4 +1,4 @@
-name: Automated Code Review (Bash Version)
+name: Code Improver
 
 on:
   workflow_dispatch:
