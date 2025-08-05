@@ -98,30 +98,24 @@ jobs:
           
           # Run the Python script with error handling
           set +e  # Don't exit on error immediately
-          python automated_code_improver.py > review_output.json 2>&1
+          python automated_code_improver.py > review_output.txt 2>&1
           python_exit_code=$?
           set -e  # Re-enable exit on error
           
           echo "Python script exit code: $python_exit_code"
           
-          if [ -f "review_output.json" ]; then
+          if [ -f "review_output.txt" ]; then
             echo "========================= Review Output Content =============================="
-            cat review_output.json
+            cat review_output.txt
             echo "========================= End of Review Output =============================="
-          
-            # Use jq to parse JSON safely
-            diff_content=$(jq -r '.diff' review_output.json)
-            formatted_response=$(jq -r '.review' review_output.json)
-            total_issues=$(jq -r '.issues_count' review_output.json)
-          
-            echo "diff_content=$diff_content" >> $GITHUB_ENV
-            echo "formatted_response=$formatted_response" >> $GITHUB_ENV
-            echo "total_issues=$total_issues" >> $GITHUB_ENV
+            OUTPUT=$(review_output.txt)
           else
             echo "Review output file was not created!"
             exit 1
           fi
-        
+          # Set outputs for next steps
+          echo "response=$OUTPUT" >> $GITHUB_OUTPUT
+            
           # Check if Python script failed
           if [ $python_exit_code -ne 0 ]; then
             echo "Python script failed with exit code: $python_exit_code"
@@ -132,8 +126,7 @@ jobs:
         shell: bash
         run: |
           echo "=== Debug Outputs ==="
-          echo "Score output: ${{ steps.code-review.outputs.formatted_score }}"
-          echo "Passed output: ${{ steps.code-review.outputs.total_issues }}"
+          echo "Formatted Output: ${{ steps.code-review.outputs.response }}"
                    
       - name: Comment on PR
         if: |
