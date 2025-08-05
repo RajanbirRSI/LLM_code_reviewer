@@ -121,11 +121,6 @@ REVIEW GUIDELINES
             check=True,
             encoding="utf-8"
         )
-        end_time = time.time()
-        elapsed = end_time - start_time
-        minutes = int(elapsed // 60)
-        seconds = int(elapsed % 60)
-        print(f"Response generated in {minutes} min {seconds} sec")
         
         response = result.stdout.strip()
         return response
@@ -248,19 +243,9 @@ def main():
     # Format the code to print it in the comment
     total_issues, issues = format_review(parsed_response)    
     formatted_response = format_issues_table(issues)
-    # Display results in table format
-    print("\nReview Results:")
-    print("=" * 50)
-    print(formatted_response)
-    print("=" * 50)
-    print(f"Total issues found: {total_issues}")
     
     # Store results in variables for further use
-    return {
-        'diff': diff_content,
-        'review': formatted_response,
-        'issues_count': total_issues
-    }
+    return formatted_response
 
 if __name__ == '__main__':
     results = main()
