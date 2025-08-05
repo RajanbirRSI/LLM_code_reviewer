@@ -251,11 +251,7 @@ def main():
     # print(f"Total issues found: {total_issues}")
     
     # Store results in variables for further use
-    return json.dumps({
-        'diff': diff_content,
-        'review': formatted_response,
-        'issues_count': total_issues
-    })
+    return formatted_reponse
 
 if __name__ == '__main__':
     results = main()
