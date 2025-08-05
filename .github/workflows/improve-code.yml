@@ -108,7 +108,7 @@ jobs:
             echo "========================= Review Output Content =============================="
             cat review_output.txt
             echo "========================= End of Review Output =============================="
-            OUTPUT=$(review_output.txt)
+            OUTPUT=$(<review_output.txt)
           else
             echo "Review output file was not created!"
             exit 1
@@ -126,8 +126,9 @@ jobs:
         shell: bash
         run: |
           echo "=== Debug Outputs ==="
-          echo "Formatted Output: ${{ steps.code-review.outputs.response }}"
-
+          echo "Formatted Output: "
+          echo "${{ steps.code-review.outputs.response }}" | base64 -d
+             
       - name: Comment on PR
         if: |
           (github.event_name == 'pull_request') || 
