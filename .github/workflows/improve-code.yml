@@ -136,30 +136,5 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const score = ${{ steps.code-review.outputs.score }};
-            const passed = ${{ steps.code-review.outputs.passed }};
-            const shouldMerge = ${{ steps.check-merge.outputs.should-merge }};
-            // const shouldMerge = 'true';
-            const status = passed ? '✅ PASSED' : '❌ FAILED';
-            const mergeStatus = shouldMerge ? '🔄 Auto-merge enabled' : '⏸️ Manual review required';
-            
-            const comment = `## 🤖 Automated Code Review Results
-            
-            **Score:** ${score}/100
-            **Status:** ${status}
-            **Action:** ${mergeStatus}
-            
-            ${passed ? 
-              '✅ Your code meets our quality standards!' : 
-              '❌ Please address the issues and push changes for re-review.'
-            }
-            
-            ---
-            *Minimum score required: 75/100*`;
-            
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: comment
-            });
+            const decodedReview = Buffer.from('${{ steps.code-review.outputs.response }}', 'base64').toString('utf-8');
+            github.rest.issues.createComment(decodedReview);
