@@ -93,6 +93,7 @@ jobs:
         id: code-review
         shell: bash  # Your original bash syntax works here
         run: |
+          export LC_ALL=C.UTF-8
           echo "========================= Running Code Review =============================="
           
           # Run the Python script with explicit error handling
