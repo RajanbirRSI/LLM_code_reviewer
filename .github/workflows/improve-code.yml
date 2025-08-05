@@ -93,36 +93,39 @@ jobs:
         id: code-review
         shell: bash  # Your original bash syntax works here
         run: |
+          export LC_ALL=C.UTF-8
           echo "========================= Running Code Review =============================="
           
-          # Run the Python script with explicit error handling
+          # Run the Python script with error handling
           set +e  # Don't exit on error immediately
-          python automated_code_improver.py > review_output.txt 2>&1
+          python automated_code_improver.py > review_output.json 2>&1
           python_exit_code=$?
           set -e  # Re-enable exit on error
           
           echo "Python script exit code: $python_exit_code"
           
-          # Always show what was captured
-          if [ -f "review_output.txt" ]; then
+          if [ -f "review_output.json" ]; then
             echo "========================= Review Output Content =============================="
-            cat review_output.txt
-            echo "========================= End of Review Output "=========================
-            diff_content=$(grep -oP "(?<=diff': ).*?(?=, 'review')" review_output.txt)
-            formatted_response=$(grep -oP "(?<=review': ).*?(?=, 'issues_count')" review_output.txt)
-            total_issues=$(grep -oP "(?<=issues_count': )\d+" review_output.txt)
+            cat review_output.json
+            echo "========================= End of Review Output =============================="
+          
+            # Use jq to parse JSON safely
+            diff_content=$(jq -r '.diff' review_output.json)
+            formatted_response=$(jq -r '.review' review_output.json)
+            total_issues=$(jq -r '.issues_count' review_output.json)
+          
             echo "diff_content=$diff_content" >> $GITHUB_ENV
             echo "formatted_response=$formatted_response" >> $GITHUB_ENV
-            echo "total_issues=$total_issues" >> $GITHUB_ENV          
+            echo "total_issues=$total_issues" >> $GITHUB_ENV
           else
             echo "Review output file was not created!"
             exit 1
           fi
-          
+        
           # Check if Python script failed
           if [ $python_exit_code -ne 0 ]; then
             echo "Python script failed with exit code: $python_exit_code"
-            # Don't exit here, try to extract score anyway
+            # Don't exit here; we already captured the output if available
           fi
 
       - name: Debug outputs
