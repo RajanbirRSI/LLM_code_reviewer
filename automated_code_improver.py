@@ -243,10 +243,9 @@ def main():
     # Format the code to print it in the comment
     total_issues, issues = format_review(parsed_response)    
     formatted_response = format_issues_table(issues)
-    encoded_response = base64.b64encode(formatted_response.encode()).decode()
     
     # Store results in variables for further use
-    return encoded_reponse
+    return formatted_response
 
 if __name__ == '__main__':
     results = main()
