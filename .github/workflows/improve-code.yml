@@ -89,7 +89,7 @@ jobs:
             ollama pull hf.co/bartowski/Llama-3.2-3B-Instruct-GGUF:IQ3_M 
           }
 
-      - name: Run automated code reviewer
+      - name: Run automated code improver
         id: code-review
         shell: bash  # Your original bash syntax works here
         run: |
@@ -108,6 +108,12 @@ jobs:
             echo "========================= Review Output Content =============================="
             cat review_output.txt
             echo "========================= End of Review Output "=========================
+            diff_content=$(grep -oP "(?<=diff': ).*?(?=, 'review')" review_output.txt)
+            formatted_response=$(grep -oP "(?<=review': ).*?(?=, 'issues_count')" review_output.txt)
+            total_issues=$(grep -oP "(?<=issues_count': )\d+" review_output.txt)
+            echo "diff_content=$diff_content" >> $GITHUB_ENV
+            echo "formatted_response=$formatted_response" >> $GITHUB_ENV
+            echo "total_issues=$total_issues" >> $GITHUB_ENV          
           else
             echo "Review output file was not created!"
             exit 1
@@ -123,8 +129,8 @@ jobs:
         shell: bash
         run: |
           echo "=== Debug Outputs ==="
-          echo "Score output: ${{ steps.code-review.outputs.score }}"
-          echo "Passed output: ${{ steps.code-review.outputs.passed }}"
+          echo "Score output: ${{ steps.code-review.outputs.formatted_score }}"
+          echo "Passed output: ${{ steps.code-review.outputs.total_issues }}"
                    
       - name: Comment on PR
         if: |
