@@ -127,7 +127,7 @@ jobs:
         run: |
           echo "=== Debug Outputs ==="
           echo "Formatted Output: ${{ steps.code-review.outputs.response }}"
-                   
+
       - name: Comment on PR
         if: |
           (github.event_name == 'pull_request') || 
