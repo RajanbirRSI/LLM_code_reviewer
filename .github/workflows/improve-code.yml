@@ -137,4 +137,9 @@ jobs:
         with:
           script: |
             const decodedReview = Buffer.from('${{ steps.code-review.outputs.response }}', 'base64').toString('utf-8');
-            github.rest.issues.createComment(decodedReview);
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: decodedReview
+            });
